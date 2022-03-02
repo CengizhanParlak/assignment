@@ -16,4 +16,7 @@ class ApiConstants {
 
   static const SIGN_UP = "$API_URL/Login/SignUp";
   static const LOGIN_URL = "$API_URL/Login/SignIn";
+
+  static const TEST_TOKEN =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI";
 }

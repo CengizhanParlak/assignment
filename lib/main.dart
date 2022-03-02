@@ -3,7 +3,8 @@ import 'dart:ffi';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/view/authenticate/login/model/user_model.dart';
-import 'package:assignment/view/home/home_screen/model/blog.dart';
+import 'package:assignment/view/home/home_screen/model/blog_post.dart';
+import 'package:assignment/view/home/home_screen/model/category.dart';
 import 'package:assignment/view/home/home_screen/service/network_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:assignment/view/authenticate/login/service/user_repository.dart';
@@ -192,30 +193,50 @@ class HomeScreen extends StatelessWidget {
             flex: 2,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: const [
-                  Card(
-                    child: Placeholder(
-                      fallbackWidth: 200,
-                      fallbackHeight: 40,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  Card(
-                    child: Placeholder(
-                      fallbackWidth: 200,
-                      fallbackHeight: 40,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  Card(
-                    child: Placeholder(
-                      fallbackWidth: 200,
-                      fallbackHeight: 40,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
+              child: FutureBuilder<List<Category>>(
+                future: getCategories(ApiConstants.TEST_TOKEN),
+                builder: ((_, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                      List<Category> categories = snapshot.data;
+                      return Row(
+                        children: [
+                          for (var category in categories) ...{
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Card(
+                                    child: Image.network(
+                                      category.image!,
+                                      fit: BoxFit.fill,
+                                      width: getSize(context).width * 0.45,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(category.title!),
+                                ),
+                              ],
+                            )
+                          }
+                        ],
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('Error while fetching Data from API'),
+                      );
+                    }
+                    return const Center(
+                      child: Text('No Data'),
+                    );
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
               ),
             ),
           ),
@@ -225,15 +246,15 @@ class HomeScreen extends StatelessWidget {
           const Text('Blog'),
           Expanded(
             flex: 8,
-            child: FutureBuilder<List<Blog>>(
+            child: FutureBuilder<List<BlogPost>>(
               future: getBlogPosts(
-                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOTlkOGIwN2QxZTEzOWFmNWI0Y2YiLCJuYmYiOjE2NDYyMzgxNjgsImV4cCI6MTY0ODgzMDE2OCwiaXNzIjoiaSIsImF1ZCI6ImEifQ.lpmO04HwFmExg9JCVMsKznbhMCq6sidIiOS5WvDRft8"),
+                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI"),
               builder: ((BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData) {
-                    List<Blog> blogs = snapshot.data;
+                  if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                    List<BlogPost> blogs = snapshot.data;
                     return GridView.builder(
-                      itemCount: 10,
+                      itemCount: 10, // TODO: blogs.length
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2, mainAxisExtent: getSize(context).height * 0.4
                           // crossAxisSpacing: 4.0,
@@ -489,7 +510,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                List<Blog>? blogs = await getBlogPosts(
+                List<BlogPost>? blogs = await getBlogPosts(
                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI");
                 print(blogs?.length);
                 // print(ApiConstants.BLOG_POST);

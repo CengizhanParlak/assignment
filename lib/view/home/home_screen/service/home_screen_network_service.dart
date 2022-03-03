@@ -6,7 +6,6 @@ import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
-import 'package:assignment/view/home/home_screen/model/ex_blog_post_model.dart';
 import 'package:http/http.dart' as http;
 
 // TODO: auth token'lar kullanıcı class'ında tutulsun. Argüman olarak gönderilmesin. Shared preferences ile lokalde tutulsun.
@@ -93,7 +92,7 @@ class HomeScreenNetworkService with NetworkHelper {
     return Future.value(-1);
   }
 
-  Future<List<ExBlogPost>>? getBlogPostsPOST(String token, {String categoryId = ""}) async {
+  Future<List<BlogPost>>? getBlogPostsPOST(String token, {String categoryId = ""}) async {
     var body = {
       "categoryId": categoryId,
     };
@@ -105,10 +104,10 @@ class HomeScreenNetworkService with NetworkHelper {
     );
 
     if (model?.data != null) {
-      return model!.data!.map((e) => ExBlogPost(BlogPost.fromJson(e))).toList();
+      return model!.data!.map<BlogPost>((e) => BlogPost.fromJson(e)).toList();
     }
 
-    return <ExBlogPost>[];
+    return <BlogPost>[];
   }
 
   Future<List<Category>>? getCategoriesGET(String token) async {
@@ -119,7 +118,7 @@ class HomeScreenNetworkService with NetworkHelper {
     );
 
     if (model?.data != null) {
-      return model!.data!.map((e) => Category.fromJson(e)).toList();
+      return model!.data!.map<Category>((e) => Category.fromJson(e)).toList();
     }
 
     return <Category>[];

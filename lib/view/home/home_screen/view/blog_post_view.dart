@@ -1,7 +1,6 @@
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
-import 'package:assignment/view/home/home_screen/model/ex_blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
@@ -122,12 +121,13 @@ Expanded blogPostGridView(BlogPostViewModel vmBlogPost, BuildContext context) {
                               icon: Observer(builder: (_) {
                                 return Icon(
                                   Icons.favorite,
-                                  color: vmBlogPost.blogPosts.elementAt(index).isFavorite ? Colors.red : Colors.grey,
+                                  color: vmBlogPost.blogPosts.elementAt(index).isFavorited ? Colors.red : Colors.grey,
                                 );
                               }),
                               onPressed: () {
-                                vmBlogPost.blogPosts.elementAt(index).isFavorite =
-                                    !vmBlogPost.blogPosts.elementAt(index).isFavorite;
+                                print(vmBlogPost.blogPosts.elementAt(index).isFavorited);
+                                vmBlogPost.blogPosts.elementAt(index).isFavorited =
+                                    !vmBlogPost.blogPosts.elementAt(index).isFavorited;
                                 // TODO: implement favorite
                               },
                             ),

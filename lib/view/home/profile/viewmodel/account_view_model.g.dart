@@ -39,6 +39,28 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
   }
 
   @override
+  void getAccountInfo() {
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.getAccountInfo');
+    try {
+      return super.getAccountInfo();
+    } finally {
+      _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setFavorites() {
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.setFavorites');
+    try {
+      return super.setFavorites();
+    } finally {
+      _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void changeAccountImage(String url) {
     final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
         name: '_AccountViewModelBase.changeAccountImage');

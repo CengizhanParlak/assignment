@@ -6,9 +6,9 @@ part 'category_view_model.g.dart';
 
 class CategoryViewModel = _CategoryViewModelBase with _$CategoryViewModel;
 
-late final networkService = HomeScreenNetworkService();
-
 abstract class _CategoryViewModelBase with Store {
+  final HomeScreenNetworkService networkService = HomeScreenNetworkService();
+
   @observable
   List<Category>? categories;
 

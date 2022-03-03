@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:assignment/api_test.dart';
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/view/authenticate/login/model/user_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
 import 'package:assignment/view/home/home_screen/view/blog_post_view.dart';
+import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/profile/view/account_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:assignment/view/authenticate/login/service/user_repository.dart';
@@ -189,10 +191,18 @@ class LandingView extends StatefulWidget {
 class _LandingViewState extends State<LandingView> {
   int _selectedIndex = 1;
 
+  BlogPostViewModel? vmBlogPost;
+
   void _changePage(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    vmBlogPost = BlogPostViewModel();
   }
 
   Widget get childWidget {
@@ -203,6 +213,8 @@ class _LandingViewState extends State<LandingView> {
         return const HomeScreen();
       case 2:
         return const ProfileScreen();
+      case 3:
+        return const ApiTestScreen();
       default:
         return const HomeScreen();
     }
@@ -216,6 +228,8 @@ class _LandingViewState extends State<LandingView> {
         return const Text('Home');
       case 2:
         return const Text('My Profile');
+      case 3:
+        return const Text('Api Test');
       default:
         return const Text('Home');
     }
@@ -246,18 +260,48 @@ class _LandingViewState extends State<LandingView> {
             selectedItemColor: Colors.grey.shade900,
             currentIndex: _selectedIndex,
             onTap: _changePage,
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
+                icon: Stack(
+                  children: <Widget>[
+                    const Icon(Icons.notifications),
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 12,
+                          minHeight: 12,
+                        ),
+                        child: Text(
+                          '${vmBlogPost?.favoritedBlogPostCount ?? 0}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
                 label: 'Favorite',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Home',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.person),
                 label: 'Profile',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.text_snippet),
+                label: 'Api Test',
               ),
             ],
           ),

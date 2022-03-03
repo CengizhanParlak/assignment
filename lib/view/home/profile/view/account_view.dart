@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:assignment/core/constants/api_constants.dart';
-import 'package:assignment/view/home/home_screen/model/ex_blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/profile/service/account_screen_network_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,92 +18,65 @@ class ProfileScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 50),
         child: Column(
           children: [
-            TextButton(
-              onPressed: () {},
-              child: const Text('Signin'),
+            Container(
+              decoration: _getDecoration(context, 100, Colors.white),
+              height: size.height * 0.1,
+              width: size.height * 0.1,
             ),
-            TextButton(
-              onPressed: () {
-                // http.get(url)
-              },
-              child: const Text('Login'),
+            SizedBox(
+              height: size.height * 0.05,
             ),
-            TextButton(
-              onPressed: () async {},
-              child: const Text('Get Blogs'),
+            Container(
+              height: size.height * 0.2,
+              width: 350,
+              decoration: _getDecoration(context, 25, Colors.white),
             ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Get Blogs by Category'),
+            SizedBox(
+              height: size.height * 0.05,
+            ),
+            Container(
+              height: size.height * 0.1,
+              width: 350,
+              decoration: _getDecoration(context, 15, Colors.white),
+              child: TextButton(
+                onPressed: (() {
+                  // TODO: api isteği at
+                }),
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: Colors.grey.shade900,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              height: 65,
+              width: 350,
+              decoration: _getDecoration(context, 15, Colors.grey.shade900),
+              child: TextButton(
+                onPressed: (() {
+                  Navigator.of(context).pushNamed('/login');
+                  // TODO: çıkış yap
+                }),
+                child: const Text(
+                  'Log Out',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
-    // return Center(
-    //   child: Padding(
-    //     padding: const EdgeInsets.only(top: 50),
-    //     child: Column(
-    //       children: [
-    //         Container(
-    //           decoration: _getDecoration(context, 100, Colors.white),
-    //           height: size.height * 0.1,
-    //           width: size.height * 0.1,
-    //         ),
-    //         SizedBox(
-    //           height: size.height * 0.05,
-    //         ),
-    //         Container(
-    //           height: size.height * 0.2,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 25, Colors.white),
-    //         ),
-    //         SizedBox(
-    //           height: size.height * 0.05,
-    //         ),
-    //         Container(
-    //           height: size.height * 0.1,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 15, Colors.white),
-    //           child: TextButton(
-    //             onPressed: (() {
-    //               // TODO: api isteği at
-    //             }),
-    //             child: Text(
-    //               'Save',
-    //               style: TextStyle(
-    //                 color: Colors.grey.shade900,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //         const SizedBox(
-    //           height: 20,
-    //         ),
-    //         Container(
-    //           height: 65,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 15, Colors.grey.shade900),
-    //           child: TextButton(
-    //             onPressed: (() {
-    //               Navigator.of(context).pushNamed('/login');
-    //               // TODO: çıkış yap
-    //             }),
-    //             child: const Text(
-    //               'Log Out',
-    //               style: TextStyle(
-    //                 color: Colors.white,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 
   BoxDecoration _getDecoration(BuildContext context, double radius, Color color) {

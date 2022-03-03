@@ -1,7 +1,3 @@
-// class Api extends ApiBase{
-//   String? _apiKey;
-// }
-
 class ApiConstants {
   static const API_URL = "http://test20.internative.net";
 
@@ -18,5 +14,5 @@ class ApiConstants {
   static const LOGIN_URL = "$API_URL/Login/SignIn";
 
   static const TEST_TOKEN =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOTlkOGIwN2QxZTEzOWFmNWI0Y2YiLCJuYmYiOjE2NDYyMzgxNjgsImV4cCI6MTY0ODgzMDE2OCwiaXNzIjoiaSIsImF1ZCI6ImEifQ.lpmO04HwFmExg9JCVMsKznbhMCq6sidIiOS5WvDRft8";
 }

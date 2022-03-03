@@ -8,7 +8,7 @@ BaseApiModel baseApiModelFromJson(String str) => BaseApiModel.fromJson(json.deco
 
 String baseApiModelToJson(BaseApiModel data) => json.encode(data.toJson());
 
-class BaseApiModel {
+class BaseApiModel<T> {
   BaseApiModel({
     this.validationErrors,
     this.hasError,
@@ -18,22 +18,26 @@ class BaseApiModel {
 
   List<ValidationError>? validationErrors;
   bool? hasError;
-  dynamic message;
-  List<dynamic>? data;
+  String? message;
+  T? data;
 
   factory BaseApiModel.fromJson(Map<String, dynamic> json) => BaseApiModel(
-        validationErrors: List<ValidationError>.from(json["ValidationErrors"].map((x) => ValidationError.fromJson(x))),
-        hasError: json["HasError"],
-        message: json["Message"],
-        data: json["Data"] == null ? [] : List<dynamic>.from(json["Data"].map((x) => x)),
+        validationErrors: parseValidationErrors(json["ValidationErrors"]),
+        hasError: json["HasError"] ?? "",
+        message: json["Message"] ?? "",
+        data: json["Data"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
         "ValidationErrors": List<dynamic>.from(validationErrors!.map((x) => x.toJson())),
         "HasError": hasError,
         "Message": message,
-        "Data": data == null ? [].map((x) => x) : List<dynamic>.from(data!.map((x) => x)),
+        "Data": jsonEncode(data),
       };
+
+  static List<ValidationError>? parseValidationErrors(json) {
+    return List<ValidationError>.from(json.map((x) => ValidationError.fromJson(x)));
+  }
 }
 
 class ValidationError {

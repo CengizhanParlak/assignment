@@ -16,6 +16,13 @@ mixin _$BlogPostViewModel on _BlogPostViewModel, Store {
           Computed<List<ExBlogPost>>(() => super.favoritedBlogPosts,
               name: '_BlogPostViewModel.favoritedBlogPosts'))
       .value;
+  Computed<bool>? _$isBlogPostsEmptyComputed;
+
+  @override
+  bool get isBlogPostsEmpty => (_$isBlogPostsEmptyComputed ??= Computed<bool>(
+          () => super.isBlogPostsEmpty,
+          name: '_BlogPostViewModel.isBlogPostsEmpty'))
+      .value;
   Computed<bool>? _$isFavoritedBlogPostsEmptyComputed;
 
   @override
@@ -52,6 +59,7 @@ mixin _$BlogPostViewModel on _BlogPostViewModel, Store {
     return '''
 blogPosts: ${blogPosts},
 favoritedBlogPosts: ${favoritedBlogPosts},
+isBlogPostsEmpty: ${isBlogPostsEmpty},
 isFavoritedBlogPostsEmpty: ${isFavoritedBlogPostsEmpty}
     ''';
   }

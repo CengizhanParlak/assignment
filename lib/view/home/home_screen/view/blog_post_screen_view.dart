@@ -1,13 +1,14 @@
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
-import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
 import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:collection/collection.dart';
+import 'package:provider/provider.dart';
 
 Size getSize(BuildContext context) {
   return MediaQuery.of(context).size;
@@ -18,26 +19,28 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlogPostViewModel vmBlogPost = BlogPostViewModel();
-    CategoryViewModel vmCategory = CategoryViewModel();
-    vmCategory.fetchCategories();
-    vmBlogPost.fetchBlogPosts();
+    final blogPostListViewModel = Provider.of<BlogPostListViewModel>(context);
+    final categoryViewModel = Provider.of<CategoryViewModel>(context);
+    final blogPostViewModel = Provider.of<BlogPostListViewModel>(context);
+    categoryViewModel.fetchCategories();
+    blogPostListViewModel.fetchBlogPosts();
+
     return Center(
       child: Column(
         children: [
-          categoryHorizontalScrollView(vmBlogPost, vmCategory, context),
+          categoryHorizontalScrollView(blogPostListViewModel, categoryViewModel, context),
           const SizedBox(
             height: 20,
           ),
           const Text('Blog'),
-          blogPostGridView(vmBlogPost, context),
+          blogPostGridView(blogPostListViewModel, context),
         ],
       ),
     );
   }
 
   Flexible categoryHorizontalScrollView(
-      BlogPostViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
+      BlogPostListViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
     return Flexible(
       flex: 2,
       child: SingleChildScrollView(
@@ -61,8 +64,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  List<GestureDetector> categoryCard(BlogPostViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
-    int index = 0;
+  List<GestureDetector> categoryCard(
+      BlogPostListViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
     var categoryWidgets = vmCategory.categories!.mapIndexed((index, category) {
       return GestureDetector(
         onTap: () {
@@ -82,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Card(
                     child: Image.network(
-                      category.image!,
+                      category.image ?? '',
                       fit: BoxFit.fill,
                       width: getSize(context).width * 0.40,
                     ),
@@ -110,7 +113,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-Expanded blogPostGridView(BlogPostViewModel vmBlogPost, BuildContext context) {
+Expanded blogPostGridView(BlogPostListViewModel vmBlogPost, BuildContext context) {
   return Expanded(
     flex: 8,
     child: Observer(
@@ -143,7 +146,6 @@ Expanded blogPostGridView(BlogPostViewModel vmBlogPost, BuildContext context) {
                           Image.network(
                             vmBlogPost.blogPosts.elementAt(index).image!,
                             fit: BoxFit.fill,
-                            // height: getSize(context).height * 0.2,
                           ),
                           Positioned(
                             top: 0,

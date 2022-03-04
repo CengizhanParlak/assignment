@@ -1,6 +1,6 @@
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/home/profile/model/account.dart';
-import 'package:assignment/view/home/profile/service/account_screen_network_service.dart';
+import 'package:assignment/view/home/profile/service/account_network_service.dart';
 import 'package:mobx/mobx.dart';
 
 part 'account_view_model.g.dart';
@@ -9,7 +9,7 @@ class AccountViewModel = _AccountViewModelBase with _$AccountViewModel;
 
 // TODO: BaseViewModel ekle https://github.com/VB10/flutter-architecture-template/blob/master/lib/view/home/build/feed/viewmodel/build_feed_view_model.dart
 abstract class _AccountViewModelBase with Store {
-  final AccountScreenNetworkService networkService = AccountScreenNetworkService();
+  final AccountNetworkService networkService = AccountNetworkService();
 
   @observable
   Account? account;

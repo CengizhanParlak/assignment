@@ -4,18 +4,33 @@ import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/home/favorite/model/favorite_posts.dart';
 import 'package:assignment/view/home/favorite/viewmodel/favorite_posts_view_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
-import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 
 part 'blog_post_view_model.g.dart';
 
-class BlogPostViewModel = _BlogPostViewModel with _$BlogPostViewModel;
+class BlogPostListViewModel = _BlogPostListVievModelBase with _$BlogPostListViewModel;
 
-abstract class _BlogPostViewModel with Store {
-  final HomeScreenNetworkService networkService = HomeScreenNetworkService();
+abstract class _BlogPostListVievModelBase with Store {
+  final BlogNetworkService networkService = BlogNetworkService();
 
-  final FavoritePostsViewModel favoritePostsViewModel = FavoritePostsViewModel();
+  FavoritePostsViewModel? favoritePostsViewModel;
+
+  @observable
+  bool isInitialized = false;
+
+  @action
+  void initViedModel(BuildContext context) {
+    favoritePostsViewModel = Provider.of<FavoritePostsViewModel>(context);
+    debugPrint("viewModel initted -- dependency injection");
+    isInitialized = true;
+  }
+
+  @computed
+  bool get isInitted => isInitialized;
 
   BlogPost getPostAtIndex(int index) => blogPosts[index];
 
@@ -47,13 +62,13 @@ abstract class _BlogPostViewModel with Store {
     if (value == 1) {
       // FIX: Article sayfası açılınca blog postlar siliniyor.
       if (blogPosts.isNotEmpty && blogPosts.length >= index) {
-        favoritePostsViewModel.addToFavorite(FavoritePost(blogPost: blogPosts[index]));
+        favoritePostsViewModel?.addToFavorite(FavoritePost(blogPost: blogPosts[index]));
         blogPosts.elementAt(index).isFavorited = true;
       }
     } else if (value == 0) {
       if (blogPosts.isNotEmpty && blogPosts.length >= index) {
-        favoritePostsViewModel.removeFromFavorite(
-          blogPosts.elementAt(index).id!,
+        favoritePostsViewModel?.removeFromFavorite(
+          articleId,
         );
         blogPosts.elementAt(index).isFavorited = false;
       }

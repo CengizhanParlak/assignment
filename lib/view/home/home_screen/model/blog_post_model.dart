@@ -2,44 +2,41 @@
 //
 //     final blog = blogFromJson(jsonString);
 
-import 'dart:convert';
+import 'package:mobx/mobx.dart';
+part 'blog_post_model.g.dart';
 
-BlogPost blogPostFromJson(String str) => BlogPost.fromJson(json.decode(str));
+class BlogPost extends _BlogPostViewModel with _$BlogPost {
+  BlogPost.fromJson(Map<String, dynamic> json) {
+    title = json['Title'] as String?;
+    content = json['Content'] as String?;
+    image = json['Image'] as String?;
+    categoryId = json['CategoryId'] as String?;
+    id = json['Id'] as String?;
+    isFavorited = json['isFavorited'] ?? false;
+  }
 
-String blogPostToJson(BlogPost data) => json.encode(data.toJson());
+  Map<String, dynamic> toJson(BlogPost instance) => <String, dynamic>{
+        'Title': instance.title,
+        'Content': instance.content,
+        'Image': instance.image,
+        'CategoryId': instance.categoryId,
+        'Id': instance.id,
+        'IsFavorited': instance.isFavorited,
+      };
+}
 
-class BlogPost {
-  BlogPost({
-    this.title,
-    this.content,
-    this.image,
-    this.categoryId,
-    this.id,
-    this.isFavorited = false,
-  });
-
+abstract class _BlogPostViewModel with Store {
   String? title;
   String? content;
   String? image;
   String? categoryId;
   String? id;
-  bool isFavorited;
 
-  factory BlogPost.fromJson(Map<String, dynamic> json) => BlogPost(
-        title: json["Title"],
-        content: json["Content"],
-        image: json["Image"],
-        categoryId: json["CategoryId"],
-        id: json["Id"],
-        isFavorited: false,
-      );
+  @observable
+  bool isFavorited = false;
 
-  Map<String, dynamic> toJson() => {
-        "Title": title,
-        "Content": content,
-        "Image": image,
-        "CategoryId": categoryId,
-        "Id": id,
-        "IsFavorited": isFavorited,
-      };
+  @action
+  void toggleFavorite() {
+    isFavorited = !isFavorited;
+  }
 }

@@ -23,4 +23,7 @@ abstract class _FavoritePostsViewModel with Store {
   void addToFavorite(FavoritePost favoritePost) {
     favoritePosts.add(favoritePost);
   }
+
+  @computed
+  int get favoritePostsCount => favoritePosts.length;
 }

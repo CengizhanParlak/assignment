@@ -3,21 +3,26 @@ import 'dart:ffi';
 
 import 'package:assignment/api_test.dart';
 import 'package:assignment/core/base/model/base_api_model.dart';
-import 'package:assignment/view/authenticate/login/model/user_model.dart';
-import 'package:assignment/view/home/favorite/view/favorite_screen.dart';
+import 'package:assignment/view/authenticate/login/model/login_model.dart';
+import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
+import 'package:assignment/view/home/favorite/view/favorite_post_screen_view.dart';
+import 'package:assignment/view/home/favorite/viewmodel/favorite_posts_view_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
-import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
 import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
-import 'package:assignment/view/home/home_screen/view/blog_post_view.dart';
+import 'package:assignment/view/home/home_screen/view/blog_post_screen_view.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
+import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
 import 'package:assignment/view/home/profile/view/account_view.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
-import 'package:assignment/view/authenticate/login/service/user_repository.dart';
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+
+import 'view/authenticate/login/view/login_screen_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,91 +34,50 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/': (context) => const AuthScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignUpScreen(),
-        '/landing': (context) => const LandingView(),
-        '/home': (context) => const HomeScreen(),
-        ArticleScreen.routeName: (context) => const ArticleScreen(),
-        '/favorite': (context) => const FavoriteScreen(),
-        '/profile': (context) => const ProfileScreen(),
-      },
-      title: 'Blog It',
-      theme: ThemeData.light(),
+    return MultiProvider(
+      providers: [
+        Provider<BlogPostListViewModel>(create: (_) => BlogPostListViewModel()),
+        Provider<CategoryViewModel>(create: (_) => CategoryViewModel()),
+        Provider<BlogPost>(create: (_) => BlogPost.fromJson({})),
+        Provider<FavoritePostsViewModel>(create: (_) => FavoritePostsViewModel()),
+        Provider<LoginViewModel>(create: (_) => LoginViewModel()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const AuthScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/signup': (context) => const SignUpScreen(),
+          '/landing': (context) => const LandingView(),
+          '/home': (context) => const HomeScreen(),
+          ArticleScreen.routeName: (context) => const ArticleScreen(),
+          '/favorite': (context) => const FavoriteScreen(),
+          '/profile': (context) => const ProfileScreen(),
+        },
+        title: 'Blog It',
+        theme: ThemeData.light(),
+      ),
     );
   }
 }
 
 class AuthScreen extends StatelessWidget {
-  const AuthScreen({Key? key, this.isAuth = true}) : super(key: key);
-  final bool isAuth;
-  @override
-  Widget build(BuildContext context) {
-    if (isAuth) {
-      return const LandingView();
-    }
-    return const LoginScreen();
-  }
-}
-
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key, User? user}) : super(key: key);
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final vmLogin = Provider.of<LoginViewModel>(context);
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: const Text('Login'),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            const Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey.shade900,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/landing')),
-              child: const Text(
-                'Login',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/signup')),
-              child: Text(
-                'Register',
-                style: TextStyle(
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ),
-          ],
+      child: Center(
+        child: Observer(
+          builder: (_) {
+            if (vmLogin.isLoggedIn) {
+              return const LandingView();
+            } else {
+              return const LoginScreen();
+            }
+          },
         ),
       ),
     );
@@ -121,7 +85,7 @@ class LoginScreen extends StatelessWidget {
 }
 
 class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({Key? key, User? user}) : super(key: key);
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +157,6 @@ class LandingView extends StatefulWidget {
 class _LandingViewState extends State<LandingView> {
   int _selectedIndex = 1;
 
-  BlogPostViewModel? vmBlogPost;
-
   void _changePage(int index) {
     setState(() {
       _selectedIndex = index;
@@ -204,7 +166,6 @@ class _LandingViewState extends State<LandingView> {
   @override
   void initState() {
     super.initState();
-    vmBlogPost = BlogPostViewModel();
   }
 
   Widget get childWidget {
@@ -239,6 +200,9 @@ class _LandingViewState extends State<LandingView> {
 
   @override
   Widget build(BuildContext context) {
+    final blogPostListVM = Provider.of<BlogPostListViewModel>(context);
+    blogPostListVM.initViedModel(context);
+    final favoritePostsVM = Provider.of<FavoritePostsViewModel>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -279,14 +243,16 @@ class _LandingViewState extends State<LandingView> {
                           minWidth: 12,
                           minHeight: 12,
                         ),
-                        child: Text(
-                          '${vmBlogPost?.favoritedBlogPostCount ?? 0}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        child: Observer(builder: (_) {
+                          return Text(
+                            '${favoritePostsVM.favoritePostsCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          );
+                        }),
                       ),
                     )
                   ],

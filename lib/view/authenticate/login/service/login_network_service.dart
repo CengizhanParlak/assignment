@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/core/constants/api_constants.dart';
+import 'package:assignment/core/service/INetwork_service.dart';
 import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
-import 'package:assignment/view/home/profile/model/account.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class AccountScreenNetworkService with NetworkHelper {
+class LoginNetworkService with NetworkHelper implements INetworkService {
+  @override
   Future<BaseApiModel>? sendRequest(
     String url,
     String authToken, {
@@ -17,7 +19,7 @@ class AccountScreenNetworkService with NetworkHelper {
     http.Response? response;
     switch (method) {
       case "post":
-        if (url == ApiConstants.BLOG_POST) {
+        if (url == ApiConstants.SIGN_IN) {
           response = await sendPostRequest(
             url: url,
             token: authToken,
@@ -29,7 +31,7 @@ class AccountScreenNetworkService with NetworkHelper {
               className: "lib/view/home/home_screen/service/network_request.dart",
             );
           });
-        } else if (url == ApiConstants.BLOG_POST_FAV) {
+        } else if (url == ApiConstants.SIGN_UP) {
           response = await sendPostRequest(
             url: url,
             token: authToken,
@@ -38,20 +40,6 @@ class AccountScreenNetworkService with NetworkHelper {
             Log.onError(
               err,
               "sendPostRequestToggleFav",
-              className: "lib/view/home/home_screen/service/network_request.dart",
-            );
-          });
-        }
-        break;
-      case "get":
-        if (url == ApiConstants.ACCOUNT_GET) {
-          response = await sendGetRequest(
-            url: url,
-            token: authToken,
-          ).catchError((err) {
-            Log.onError(
-              err,
-              "sendGetRequest -> getAccountInfo",
               className: "lib/view/home/home_screen/service/network_request.dart",
             );
           });
@@ -68,17 +56,51 @@ class AccountScreenNetworkService with NetworkHelper {
     return BaseApiModel.fromJson(json.decode(response.body));
   }
 
-  Future<Account>? getAccountInfo(String token) async {
+  Future<BaseApiModel> signInPOST({required String email, required String password}) async {
+    var body = {
+      "Email": email,
+      "Password": password,
+    };
+
     BaseApiModel? model = await sendRequest(
-      ApiConstants.ACCOUNT_GET,
-      token,
-      method: "get",
+      ApiConstants.SIGN_IN,
+      "",
+      method: "post",
+      body: body,
     );
 
     if (model?.data != null) {
-      return Account.fromJson(model!.data);
+      String authToken = model!.data!["Token"];
+      debugPrint("resultAuthToken $authToken");
+      debugPrint("response model: ${model.toString()}");
+      ApiConstants.TEST_TOKEN = authToken;
+      return model;
     }
+    return BaseApiModel();
+  }
 
-    return Account();
+// TODO: POST GET suffixlerini çıkar
+  Future<BaseApiModel> signUpPOST({required String email, required String password}) async {
+    var body = {
+      "Email": email,
+      "Password": password,
+      "PasswordRetry": password,
+    };
+
+    BaseApiModel? model = await sendRequest(
+      ApiConstants.SIGN_UP,
+      "",
+      method: "post",
+      body: body,
+    );
+
+    if (model?.data != null) {
+      String authToken = model!.data!["Token"];
+      debugPrint("resultAuthToken $authToken");
+      debugPrint("response model: ${model.toString()}");
+      ApiConstants.TEST_TOKEN = authToken;
+      return model;
+    }
+    return BaseApiModel();
   }
 }

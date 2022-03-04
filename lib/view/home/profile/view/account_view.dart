@@ -1,15 +1,18 @@
 import 'dart:convert';
 
 import 'package:assignment/core/constants/api_constants.dart';
-import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
-import 'package:assignment/view/home/profile/service/account_screen_network_service.dart';
+import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
+import 'package:assignment/view/home/profile/service/account_network_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final loginVM = Provider.of<LoginViewModel>(context);
     var body = {
       'Email': 'cengtest@gmail.com',
       'Password': '123456',
@@ -62,7 +65,8 @@ class ProfileScreen extends StatelessWidget {
               decoration: _getDecoration(context, 15, Colors.grey.shade900),
               child: TextButton(
                 onPressed: (() {
-                  Navigator.of(context).pushNamed('/login');
+                  loginVM.isLogged = false;
+                  Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                   // TODO: çıkış yap
                 }),
                 child: const Text(

@@ -15,7 +15,6 @@ class Account {
     this.image,
     this.location,
     this.favoriteBlogIds,
-    this.token,
   });
 
   String? id;
@@ -23,7 +22,6 @@ class Account {
   String? image;
   Location? location;
   List<String>? favoriteBlogIds;
-  String? token;
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
         id: json["Id"],

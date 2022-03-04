@@ -38,6 +38,11 @@ class BaseApiModel<T> {
   static List<ValidationError>? parseValidationErrors(json) {
     return List<ValidationError>.from(json.map((x) => ValidationError.fromJson(x)));
   }
+
+  @override
+  toString() {
+    return jsonEncode(this);
+  }
 }
 
 class ValidationError {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/core/constants/api_constants.dart';
+import 'package:assignment/core/service/INetwork_service.dart';
 import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
@@ -10,7 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 // TODO: auth token'lar kullanıcı class'ında tutulsun. Argüman olarak gönderilmesin. Shared preferences ile lokalde tutulsun.
-class HomeScreenNetworkService with NetworkHelper {
+class BlogNetworkService with NetworkHelper implements INetworkService {
+  @override
   Future<BaseApiModel>? sendRequest(
     String url,
     String authToken, {
@@ -20,9 +22,9 @@ class HomeScreenNetworkService with NetworkHelper {
     http.Response? response;
     switch (method) {
       case "post":
-        if (url == ApiConstants.BLOG_POST) {
+        if (url == ApiConstants.GET_POSTS) {
           response = await sendPostRequest(
-            url: ApiConstants.BLOG_POST,
+            url: url,
             token: authToken,
             body: body,
           ).catchError((err) {
@@ -32,7 +34,7 @@ class HomeScreenNetworkService with NetworkHelper {
               className: "lib/view/home/home_screen/service/network_request.dart",
             );
           });
-        } else if (url == ApiConstants.BLOG_POST_FAV) {
+        } else if (url == ApiConstants.FAV_BLOG_POST) {
           response = await sendPostRequest(
             url: url,
             token: authToken,
@@ -47,9 +49,9 @@ class HomeScreenNetworkService with NetworkHelper {
         }
         break;
       case "get":
-        if (url == ApiConstants.BLOG_GET) {
+        if (url == ApiConstants.GET_CATEGORIES) {
           response = await sendGetRequest(
-            url: ApiConstants.BLOG_GET,
+            url: ApiConstants.GET_CATEGORIES,
             token: authToken,
           ).catchError((err) {
             Log.onError(
@@ -76,7 +78,7 @@ class HomeScreenNetworkService with NetworkHelper {
       "Id": articleId,
     };
     BaseApiModel? model = await sendRequest(
-      ApiConstants.BLOG_POST_FAV,
+      ApiConstants.FAV_BLOG_POST,
       token,
       method: "post",
       body: body,
@@ -101,7 +103,7 @@ class HomeScreenNetworkService with NetworkHelper {
       "categoryId": categoryId,
     };
     BaseApiModel? model = await sendRequest(
-      ApiConstants.BLOG_POST,
+      ApiConstants.GET_POSTS,
       token,
       method: "post",
       body: body,
@@ -116,7 +118,7 @@ class HomeScreenNetworkService with NetworkHelper {
 
   Future<List<Category>>? getCategoriesGET(String token) async {
     BaseApiModel? model = await sendRequest(
-      ApiConstants.BLOG_GET,
+      ApiConstants.GET_CATEGORIES,
       token,
       method: "get",
     );

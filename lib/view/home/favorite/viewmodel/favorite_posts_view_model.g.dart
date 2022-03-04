@@ -16,6 +16,13 @@ mixin _$FavoritePostsViewModel on _FavoritePostsViewModel, Store {
           () => super.isFavoritesEmpty,
           name: '_FavoritePostsViewModel.isFavoritesEmpty'))
       .value;
+  Computed<int>? _$favoritePostsCountComputed;
+
+  @override
+  int get favoritePostsCount => (_$favoritePostsCountComputed ??= Computed<int>(
+          () => super.favoritePostsCount,
+          name: '_FavoritePostsViewModel.favoritePostsCount'))
+      .value;
 
   final _$favoritePostsAtom =
       Atom(name: '_FavoritePostsViewModel.favoritePosts');
@@ -62,7 +69,8 @@ mixin _$FavoritePostsViewModel on _FavoritePostsViewModel, Store {
   String toString() {
     return '''
 favoritePosts: ${favoritePosts},
-isFavoritesEmpty: ${isFavoritesEmpty}
+isFavoritesEmpty: ${isFavoritesEmpty},
+favoritePostsCount: ${favoritePostsCount}
     ''';
   }
 }

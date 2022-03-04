@@ -11,7 +11,7 @@ class ArticleScreen extends StatelessWidget {
   static const routeName = '/article';
 
   void addFavorite(String id) {
-    BlogPostViewModel vmBlogPost = BlogPostViewModel();
+    BlogPostListViewModel vmBlogPost = BlogPostListViewModel();
     int index = vmBlogPost.getIndexOfPostFromId(id);
     vmBlogPost.toggleFavorite(id, index);
   }

@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:assignment/core/constants/api_constants.dart';
-import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
-import 'package:assignment/view/home/profile/service/account_screen_network_service.dart';
+import 'package:assignment/view/authenticate/login/service/login_network_service.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
+import 'package:assignment/view/home/profile/service/account_network_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,11 +11,17 @@ class ApiTestScreen extends StatelessWidget {
   const ApiTestScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var body = {
+    var signUpBody = {
       'Email': 'cengtest@gmail.com',
       'Password': '123456',
       'PasswordRetry': '123456',
     };
+    // var loginBody = {
+    //   'Email': 'cengtest@gmail.com',
+    //   'Password': '123456',
+    // };
+    var email = 'cengtest2@gmail.com';
+    var password = '123456';
     final size = MediaQuery.of(context).size;
     return Center(
       child: Padding(
@@ -22,12 +29,16 @@ class ApiTestScreen extends StatelessWidget {
         child: Column(
           children: [
             TextButton(
-              onPressed: () {},
-              child: const Text('Signin'),
+              onPressed: () {
+                var m = LoginNetworkService();
+                m.signUpPOST(email: email, password: password).then((value) => print(value));
+              },
+              child: const Text('Signup'),
             ),
             TextButton(
               onPressed: () {
-                // http.get(url)
+                var m = LoginNetworkService();
+                m.signInPOST(email: email, password: password).then((value) => print(value));
               },
               child: const Text('Login'),
             ),
@@ -41,7 +52,7 @@ class ApiTestScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                var networkService = AccountScreenNetworkService();
+                var networkService = AccountNetworkService();
                 networkService.getAccountInfo(ApiConstants.TEST_TOKEN)?.then((account) {
                   print(account.toJson());
                 });

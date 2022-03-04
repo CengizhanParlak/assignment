@@ -39,6 +39,23 @@ mixin _$CategoryViewModel on _CategoryViewModelBase, Store {
     });
   }
 
+  final _$selectedCategoryIndexAtom =
+      Atom(name: '_CategoryViewModelBase.selectedCategoryIndex');
+
+  @override
+  int get selectedCategoryIndex {
+    _$selectedCategoryIndexAtom.reportRead();
+    return super.selectedCategoryIndex;
+  }
+
+  @override
+  set selectedCategoryIndex(int value) {
+    _$selectedCategoryIndexAtom.reportWrite(value, super.selectedCategoryIndex,
+        () {
+      super.selectedCategoryIndex = value;
+    });
+  }
+
   final _$_CategoryViewModelBaseActionController =
       ActionController(name: '_CategoryViewModelBase');
 
@@ -57,6 +74,7 @@ mixin _$CategoryViewModel on _CategoryViewModelBase, Store {
   String toString() {
     return '''
 categories: ${categories},
+selectedCategoryIndex: ${selectedCategoryIndex},
 isCategoriesLoaded: ${isCategoriesLoaded},
 isCategoriesEmpty: ${isCategoriesEmpty}
     ''';

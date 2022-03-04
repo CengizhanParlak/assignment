@@ -6,6 +6,7 @@ import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 // TODO: auth token'lar kullanıcı class'ında tutulsun. Argüman olarak gönderilmesin. Shared preferences ile lokalde tutulsun.
@@ -75,17 +76,20 @@ class HomeScreenNetworkService with NetworkHelper {
       "Id": articleId,
     };
     BaseApiModel? model = await sendRequest(
-      ApiConstants.BLOG_POST,
+      ApiConstants.BLOG_POST_FAV,
       token,
       method: "post",
       body: body,
     );
 
     if (model?.data != null) {
-      if (model!.data!.first.toString().toLowerCase().contains("eklendi")) {
+      var msg = model!.message!.toLowerCase();
+      if (msg.contains("eklendi")) {
         return Future.value(1);
-      } else {
+      } else if (msg.contains("kaldırıldı")) {
         return Future.value(0);
+      } else {
+        return Future.value(-1);
       }
     }
 

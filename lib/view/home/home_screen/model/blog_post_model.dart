@@ -9,7 +9,14 @@ BlogPost blogPostFromJson(String str) => BlogPost.fromJson(json.decode(str));
 String blogPostToJson(BlogPost data) => json.encode(data.toJson());
 
 class BlogPost {
-  BlogPost({this.title, this.content, this.image, this.categoryId, this.id, this.isFavorited = false});
+  BlogPost({
+    this.title,
+    this.content,
+    this.image,
+    this.categoryId,
+    this.id,
+    this.isFavorited = false,
+  });
 
   String? title;
   String? content;

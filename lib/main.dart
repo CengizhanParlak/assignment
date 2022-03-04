@@ -7,6 +7,7 @@ import 'package:assignment/view/authenticate/login/model/user_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
 import 'package:assignment/view/home/home_screen/view/blog_post_view.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/profile/view/account_view.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpScreen(),
         '/landing': (context) => const LandingView(),
         '/home': (context) => const HomeScreen(),
-        '/article': (context) => const ArticleScreen(),
+        ArticleScreen.routeName: (context) => const ArticleScreen(),
         '/favorite': (context) => const FavoriteScreen(),
         '/profile': (context) => const ProfileScreen(),
       },
@@ -305,36 +306,6 @@ class _LandingViewState extends State<LandingView> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class ArticleScreen extends StatelessWidget {
-  const ArticleScreen({Key? key}) : super(key: key);
-
-  void addFavorite(int id) {
-    // TODO: add to favorite
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Article Detail'),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: (() => addFavorite),
-              icon: const Icon(Icons.favorite),
-            ),
-          ],
-        ),
-        body: const Placeholder(
-          fallbackHeight: 100,
-          color: Colors.blue,
         ),
       ),
     );

@@ -53,23 +53,33 @@ mixin _$BlogPostViewModel on _BlogPostViewModel, Store {
     });
   }
 
+  final _$toggleFavoriteAsyncAction =
+      AsyncAction('_BlogPostViewModel.toggleFavorite');
+
+  @override
+  Future<void> toggleFavorite(String articleId, int index) {
+    return _$toggleFavoriteAsyncAction
+        .run(() => super.toggleFavorite(articleId, index));
+  }
+
   final _$fetchBlogPostsAsyncAction =
       AsyncAction('_BlogPostViewModel.fetchBlogPosts');
 
   @override
-  Future<void> fetchBlogPosts() {
-    return _$fetchBlogPostsAsyncAction.run(() => super.fetchBlogPosts());
+  Future<void> fetchBlogPosts({String categoryId = ""}) {
+    return _$fetchBlogPostsAsyncAction
+        .run(() => super.fetchBlogPosts(categoryId: categoryId));
   }
 
   final _$_BlogPostViewModelActionController =
       ActionController(name: '_BlogPostViewModel');
 
   @override
-  void toggleFavorite(String articleId, int index) {
+  bool isFavorited(int index) {
     final _$actionInfo = _$_BlogPostViewModelActionController.startAction(
-        name: '_BlogPostViewModel.toggleFavorite');
+        name: '_BlogPostViewModel.isFavorited');
     try {
-      return super.toggleFavorite(articleId, index);
+      return super.isFavorited(index);
     } finally {
       _$_BlogPostViewModelActionController.endAction(_$actionInfo);
     }

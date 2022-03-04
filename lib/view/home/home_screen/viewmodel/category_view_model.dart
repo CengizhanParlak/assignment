@@ -12,6 +12,9 @@ abstract class _CategoryViewModelBase with Store {
   @observable
   List<Category>? categories;
 
+  @observable
+  int selectedCategoryIndex = -1;
+
   @computed
   bool get isCategoriesLoaded => categories != null;
 

@@ -13,6 +13,8 @@ class BlogPostViewModel = _BlogPostViewModel with _$BlogPostViewModel;
 abstract class _BlogPostViewModel with Store {
   final HomeScreenNetworkService networkService = HomeScreenNetworkService();
 
+  BlogPost getPostAtIndex(int index) => blogPosts[index];
+
   @observable
   ObservableList<BlogPost> blogPosts = <BlogPost>[].asObservable();
 
@@ -25,24 +27,34 @@ abstract class _BlogPostViewModel with Store {
   @computed
   bool get isFavoritedBlogPostsEmpty => favoritedBlogPosts.isEmpty;
 
+  @action
+  bool isFavorited(int index) {
+    return blogPosts[index].isFavorited;
+  }
+
   @computed
   int get favoritedBlogPostCount => blogPosts.where((element) => element.isFavorited).length;
 
   @action
-  void toggleFavorite(String articleId, int index) {
-    networkService.toggleFavoritePOST(ApiConstants.TEST_TOKEN, articleId: articleId).then((value) {
-      if (value == 1) {
-        blogPosts.elementAt(index).isFavorited = true;
-      } else if (value == 0) {
-        blogPosts.elementAt(index).isFavorited = false;
-      }
-    });
+  Future<void> toggleFavorite(String articleId, int index) async {
+    int value = await networkService.toggleFavoritePOST(ApiConstants.TEST_TOKEN, articleId: articleId);
+    if (value == 1) {
+      blogPosts.elementAt(index).isFavorited = true;
+    } else if (value == 0) {
+      blogPosts.elementAt(index).isFavorited = false;
+    }
   }
 
   @action
-  Future<void> fetchBlogPosts() async {
-    var exBlogPosts = await networkService.getBlogPostsPOST(ApiConstants.TEST_TOKEN);
+  Future<void> fetchBlogPosts({String categoryId = ""}) async {
+    var exBlogPosts = await networkService.getBlogPostsPOST(ApiConstants.TEST_TOKEN, categoryId: categoryId);
     // blogPosts.addAll(decodedJson.map((e) => ExBlogPost(BlogPost.fromJson(e))).toList().asObservable());
-    blogPosts.addAll(exBlogPosts!.toList().asObservable());
+    if (categoryId.isEmpty) {
+      blogPosts.clear();
+      blogPosts.addAll(exBlogPosts!.toList().asObservable());
+    } else {
+      blogPosts.clear();
+      blogPosts.addAll(exBlogPosts!.toList().asObservable());
+    }
   }
 }

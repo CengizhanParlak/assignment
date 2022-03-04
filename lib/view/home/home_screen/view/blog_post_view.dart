@@ -2,10 +2,12 @@ import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
+import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:collection/collection.dart';
 
 Size getSize(BuildContext context) {
   return MediaQuery.of(context).size;
@@ -23,7 +25,7 @@ class HomeScreen extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          categoryHorizontalScrollView(vmCategory, context),
+          categoryHorizontalScrollView(vmBlogPost, vmCategory, context),
           const SizedBox(
             height: 20,
           ),
@@ -34,7 +36,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Flexible categoryHorizontalScrollView(CategoryViewModel vmCategory, BuildContext context) {
+  Flexible categoryHorizontalScrollView(
+      BlogPostViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
     return Flexible(
       flex: 2,
       child: SingleChildScrollView(
@@ -49,7 +52,7 @@ class HomeScreen extends StatelessWidget {
           } else {
             return Row(
               children: [
-                ...categoryCard(vmCategory.categories!, context),
+                ...categoryCard(vmBlogPost, vmCategory, context),
               ],
             );
           }
@@ -58,28 +61,52 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  List<Column> categoryCard(List<Category> categories, BuildContext context) {
-    var x = categories.map((category) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Card(
-              child: Image.network(
-                category.image!,
-                fit: BoxFit.fill,
-                width: getSize(context).width * 0.40,
+  List<GestureDetector> categoryCard(BlogPostViewModel vmBlogPost, CategoryViewModel vmCategory, BuildContext context) {
+    int index = 0;
+    var categoryWidgets = vmCategory.categories!.mapIndexed((index, category) {
+      return GestureDetector(
+        onTap: () {
+          if (vmCategory.selectedCategoryIndex == index) {
+            vmBlogPost.fetchBlogPosts();
+            vmCategory.selectedCategoryIndex = -1;
+          } else {
+            vmBlogPost.fetchBlogPosts(categoryId: category.id!);
+            vmCategory.selectedCategoryIndex = index;
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Card(
+                    child: Image.network(
+                      category.image!,
+                      fit: BoxFit.fill,
+                      width: getSize(context).width * 0.40,
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Icon(
+                      Icons.bookmark,
+                      color: vmCategory.selectedCategoryIndex == index ? Colors.white : Colors.grey.shade900,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(category.title!),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(category.title!),
+            ),
+          ],
+        ),
       );
     }).toList();
-    return x;
+    return categoryWidgets;
   }
 }
 
@@ -94,14 +121,18 @@ Expanded blogPostGridView(BlogPostViewModel vmBlogPost, BuildContext context) {
           );
         } else {
           return GridView.builder(
-            itemCount: 10, // TODO: blogs.length
+            // TODO: vmBlogPost.blogPosts.length, keep alive yapılacak, önceki session'da son seçilen kategorideki blogları getir
+            // itemCount: vmBlogPost.blogPosts.length,
+            itemCount: vmBlogPost.blogPosts.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, mainAxisExtent: getSize(context).height * 0.4
-                // crossAxisSpacing: 4.0,
-                // mainAxisSpacing: 4.0,
-                ),
+              crossAxisCount: 2,
+              mainAxisExtent: getSize(context).height * 0.4,
+            ),
             itemBuilder: (context, index) => GestureDetector(
-              onTap: () => Navigator.of(context).pushNamed('/article'),
+              onTap: () => Navigator.of(context).pushNamed(
+                ArticleScreen.routeName,
+                arguments: vmBlogPost.blogPosts[index],
+              ),
               child: Card(
                 child: Column(
                   children: [
@@ -124,11 +155,8 @@ Expanded blogPostGridView(BlogPostViewModel vmBlogPost, BuildContext context) {
                                   color: vmBlogPost.blogPosts.elementAt(index).isFavorited ? Colors.red : Colors.grey,
                                 );
                               }),
-                              onPressed: () {
-                                print(vmBlogPost.blogPosts.elementAt(index).isFavorited);
-                                vmBlogPost.blogPosts.elementAt(index).isFavorited =
-                                    !vmBlogPost.blogPosts.elementAt(index).isFavorited;
-                                // TODO: implement favorite
+                              onPressed: () async {
+                                await vmBlogPost.toggleFavorite(vmBlogPost.getPostAtIndex(index).id!, index);
                               },
                             ),
                           ),

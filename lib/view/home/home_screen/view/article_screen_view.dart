@@ -1,4 +1,5 @@
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
+import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/parser.dart' as htmlparser;
@@ -9,8 +10,10 @@ class ArticleScreen extends StatelessWidget {
 
   static const routeName = '/article';
 
-  void addFavorite(int id) {
-    // TODO: add to favorite
+  void addFavorite(String id) {
+    BlogPostViewModel vmBlogPost = BlogPostViewModel();
+    int index = vmBlogPost.getIndexOfPostFromId(id);
+    vmBlogPost.toggleFavorite(id, index);
   }
 
   @override
@@ -27,7 +30,7 @@ class ArticleScreen extends StatelessWidget {
             centerTitle: true,
             actions: [
               IconButton(
-                onPressed: (() => addFavorite),
+                onPressed: (() => addFavorite(args.id!)),
                 icon: const Icon(Icons.favorite),
               ),
             ],

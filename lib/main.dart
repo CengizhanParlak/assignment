@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:assignment/api_test.dart';
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/view/authenticate/login/model/user_model.dart';
+import 'package:assignment/view/home/favorite/view/favorite_screen.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/model/category_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
@@ -305,33 +306,6 @@ class _LandingViewState extends State<LandingView> {
                 label: 'Api Test',
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class FavoriteScreen extends StatelessWidget {
-  const FavoriteScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GridView.builder(
-        itemCount: 10,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 4.0,
-          mainAxisSpacing: 4.0,
-        ),
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed('/article'),
-          child: const Card(
-            child: Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
           ),
         ),
       ),

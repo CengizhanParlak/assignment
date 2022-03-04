@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:assignment/core/constants/api_constants.dart';
+import 'package:assignment/view/home/favorite/model/favorite_posts.dart';
+import 'package:assignment/view/home/favorite/viewmodel/favorite_posts_view_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
 import 'package:assignment/view/home/home_screen/service/home_screen_network_service.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +15,11 @@ class BlogPostViewModel = _BlogPostViewModel with _$BlogPostViewModel;
 abstract class _BlogPostViewModel with Store {
   final HomeScreenNetworkService networkService = HomeScreenNetworkService();
 
+  final FavoritePostsViewModel favoritePostsViewModel = FavoritePostsViewModel();
+
   BlogPost getPostAtIndex(int index) => blogPosts[index];
+
+  int getIndexOfPostFromId(String id) => blogPosts.indexWhere((post) => post.id == id);
 
   @observable
   ObservableList<BlogPost> blogPosts = <BlogPost>[].asObservable();
@@ -39,9 +45,18 @@ abstract class _BlogPostViewModel with Store {
   Future<void> toggleFavorite(String articleId, int index) async {
     int value = await networkService.toggleFavoritePOST(ApiConstants.TEST_TOKEN, articleId: articleId);
     if (value == 1) {
-      blogPosts.elementAt(index).isFavorited = true;
+      // FIX: Article sayfası açılınca blog postlar siliniyor.
+      if (blogPosts.isNotEmpty && blogPosts.length >= index) {
+        favoritePostsViewModel.addToFavorite(FavoritePost(blogPost: blogPosts[index]));
+        blogPosts.elementAt(index).isFavorited = true;
+      }
     } else if (value == 0) {
-      blogPosts.elementAt(index).isFavorited = false;
+      if (blogPosts.isNotEmpty && blogPosts.length >= index) {
+        favoritePostsViewModel.removeFromFavorite(
+          blogPosts.elementAt(index).id!,
+        );
+        blogPosts.elementAt(index).isFavorited = false;
+      }
     }
   }
 

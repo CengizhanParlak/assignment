@@ -168,8 +168,8 @@ class _LandingViewState extends State<LandingView> {
         return const HomeScreen();
       case 2:
         return const ProfileScreen();
-      case 3:
-        return const ApiTestScreen();
+      // case 3:
+      //   return const ApiTestScreen();
       default:
         return const HomeScreen();
     }
@@ -183,8 +183,8 @@ class _LandingViewState extends State<LandingView> {
         return const Text('Home');
       case 2:
         return const Text('My Profile');
-      case 3:
-        return const Text('Api Test');
+      // case 3:
+      //   return const Text('Api Test');
       default:
         return const Text('Home');
     }
@@ -259,10 +259,10 @@ class _LandingViewState extends State<LandingView> {
                 icon: Icon(Icons.person),
                 label: 'Profile',
               ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.text_snippet),
-                label: 'Api Test',
-              ),
+              // const BottomNavigationBarItem(
+              //   icon: Icon(Icons.text_snippet),
+              //   label: 'Api Test',
+              // ),
             ],
           ),
         ),

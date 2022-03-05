@@ -85,7 +85,7 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
   }
 
 // TODO: POST GET suffixlerini çıkar
-  Future<BaseApiModel> signUpPOST({required String email, required String password}) async {
+  Future<BaseApiModel> signUpPOST(context, {required String email, required String password}) async {
     var body = {
       "Email": email,
       "Password": password,
@@ -100,11 +100,16 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
     );
 
     if (model?.data != null) {
-      String authToken = model!.data!["Token"];
-      debugPrint("resultAuthToken $authToken");
-      debugPrint("response model: ${model.toString()}");
-      ApiConstants.TEST_TOKEN = authToken;
-      return model;
+      if (model!.hasError!) {
+        showApiErrorDialog(context, model);
+      } else {
+        // TODO: token'i shared prefs ile lokale falan kaydet
+        String authToken = model.data!["Token"];
+        debugPrint("resultAuthToken $authToken");
+        debugPrint("response model: ${model.toString()}");
+        ApiConstants.TEST_TOKEN = authToken;
+        return model;
+      }
     }
     return BaseApiModel();
   }

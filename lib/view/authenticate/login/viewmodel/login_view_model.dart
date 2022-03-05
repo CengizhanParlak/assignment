@@ -11,8 +11,6 @@ class LoginViewModel = _LoginViewModelBase with _$LoginViewModel;
 abstract class _LoginViewModelBase with Store {
   final LoginNetworkService networkService = LoginNetworkService();
 
-  LoginModel? loginModel;
-
   @observable
   String email = "";
 

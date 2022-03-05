@@ -5,6 +5,7 @@ import 'package:assignment/api_test.dart';
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/view/authenticate/login/model/login_model.dart';
 import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
+import 'package:assignment/view/authenticate/signup/viewmodel/signup_view_model.dart';
 import 'package:assignment/view/home/favorite/view/favorite_post_screen_view.dart';
 import 'package:assignment/view/home/favorite/viewmodel/favorite_posts_view_model.dart';
 import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
@@ -23,6 +24,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 import 'view/authenticate/login/view/login_screen_view.dart';
+import 'view/authenticate/signup/view/signup_screen_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
         Provider<BlogPost>(create: (_) => BlogPost.fromJson({})),
         Provider<FavoritePostsViewModel>(create: (_) => FavoritePostsViewModel()),
         Provider<LoginViewModel>(create: (_) => LoginViewModel()),
+        Provider<SignUpViewModel>(create: (_) => SignUpViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -78,69 +81,6 @@ class AuthScreen extends StatelessWidget {
               return const LoginScreen();
             }
           },
-        ),
-      ),
-    );
-  }
-}
-
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Register'),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            const Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Re-Password',
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey.shade900,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/login')),
-              child: const Text(
-                'Register',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/login')),
-              child: Text(
-                'Login',
-                style: TextStyle(
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

@@ -6,7 +6,7 @@ A new Flutter project.
 
 - Kullanıcı mail: cengdeneme@gmail.com
 Şifre: 123456
-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOTlkOGIwN2QxZTEzOWFmNWI0Y2YiLCJuYmYiOjE2NDYyMzgxNjgsImV4cCI6MTY0ODgzMDE2OCwiaXNzIjoiaSIsImF1ZCI6ImEifQ.lpmO04HwFmExg9JCVMsKznbhMCq6sidIiOS5WvDRft8
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDY0NDQ1NjksImV4cCI6MTY0OTAzNjU2OSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.f0AfBwpSEh3pGbUQNCrgH65sxvSQLcXUCiDtPPfl7xg
 
 - Kullanıcı mail: cengtest@gmail.com
 Şifre: 123456

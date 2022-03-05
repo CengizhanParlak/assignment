@@ -1,38 +1,30 @@
-import 'package:assignment/main.dart';
+import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
+import 'package:assignment/view/authenticate/signup/viewmodel/signup_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../../signup/view/signup_screen_view.dart';
-import '../viewmodel/login_view_model.dart';
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  SignUpViewModel? signUpViewModel;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  GlobalKey<FormState> formKeyLogIn = GlobalKey<FormState>();
-  LoginViewModel? loginVM;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  TextEditingController passwordRetryController = TextEditingController();
+  GlobalKey<FormState> formKeyCreate = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: const Text('Login'),
+          title: const Text('Register'),
           centerTitle: true,
         ),
         body: GestureDetector(
@@ -40,12 +32,12 @@ class _LoginScreenState extends State<LoginScreen> {
           onTap: () {
             FocusScope.of(context).unfocus();
           },
-          child: Provider<LoginViewModel>(
-            create: (_) => loginVM = Provider.of<LoginViewModel>(context),
+          child: Provider<SignUpViewModel>(
+            create: (_) => signUpViewModel = Provider.of<SignUpViewModel>(context),
             builder: (context, __) {
-              loginVM = Provider.of<LoginViewModel>(context);
+              signUpViewModel = Provider.of<SignUpViewModel>(context);
               return Form(
-                key: formKeyLogIn,
+                key: formKeyCreate,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   keyboardType: TextInputType.emailAddress,
                                   controller: emailController,
                                   onChanged: (value) {
-                                    loginVM!.email = value;
+                                    signUpViewModel!.email = value;
                                   },
                                   validator: (value) {
                                     if (value != null) {
@@ -90,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         return 'Mail boş bırakılamaz';
                                       } else if (value.contains(" ")) {
                                         return 'Mail boşluk içeremez';
-                                      } else if (!loginVM!.isEmailValid) {
+                                      } else if (!signUpViewModel!.isEmailValid) {
                                         return 'Geçerli bir mail adresi giriniz';
                                       }
                                     }
@@ -118,9 +110,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Observer(builder: (_) {
                                 return TextFormField(
                                   controller: passwordController,
-                                  obscureText: !loginVM!.isPasswordVisible,
+                                  obscureText: !signUpViewModel!.isPasswordVisible,
                                   onChanged: (value) {
-                                    loginVM!.password = value;
+                                    signUpViewModel!.password = value;
                                   },
                                   decoration: InputDecoration(
                                     border: const OutlineInputBorder(),
@@ -134,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     suffixIcon: Observer(builder: (_) {
                                       return IconButton(
-                                        onPressed: () => loginVM!.togglePasswordVisibility(),
+                                        onPressed: () => signUpViewModel!.togglePasswordVisibility(),
                                         icon: Icon(
-                                          !loginVM!.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                          !signUpViewModel!.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                                         ),
                                         splashColor: Colors.transparent,
                                       );
@@ -149,8 +141,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     if (value.contains(' ')) {
                                       return 'Şifre boşluk içeremez';
                                     }
-                                    if (!loginVM!.isPasswordValid) {
+                                    if (!signUpViewModel!.isPasswordValid) {
                                       return 'Şifre en az 6 karakter olmalıdır';
+                                    }
+                                    if (!signUpViewModel!.isPasswordsEqual) {
+                                      return 'Şifreler eşleşmeli';
                                     }
                                     return null;
                                   },
@@ -162,6 +157,56 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: MediaQuery.of(context).size.height * 0.015,
                             ),
                             SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.97,
+                              child: Observer(builder: (_) {
+                                return TextFormField(
+                                  controller: passwordRetryController,
+                                  obscureText: !signUpViewModel!.isPasswordRetryVisible,
+                                  onChanged: (value) {
+                                    signUpViewModel!.passwordRetry = value;
+                                  },
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: 'Şifrenizi tekrar giriniz',
+                                    labelText: 'Şifre Tekrar',
+                                    hintStyle: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.shortestSide * 0.045,
+                                    ),
+                                    labelStyle: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.shortestSide * 0.05,
+                                    ),
+                                    suffixIcon: Observer(builder: (_) {
+                                      return IconButton(
+                                        onPressed: () => signUpViewModel!.togglePasswordRetryVisibility(),
+                                        icon: Icon(
+                                          !signUpViewModel!.isPasswordRetryVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                        splashColor: Colors.transparent,
+                                      );
+                                    }),
+                                  ),
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Şifre boş bırakılamaz';
+                                    }
+                                    if (value.contains(' ')) {
+                                      return 'Şifre boşluk içeremez';
+                                    }
+                                    if (!signUpViewModel!.isPasswordRetryValid) {
+                                      return 'Şifre en az 6 karakter olmalıdır';
+                                    }
+                                    if (!signUpViewModel!.isPasswordsEqual) {
+                                      return 'Şifreler eşleşmeli';
+                                    }
+                                    return null;
+                                  },
+                                  onEditingComplete: () => FocusScope.of(context).unfocus(),
+                                );
+                              }),
+                            ),
+                            SizedBox(
                               height: MediaQuery.of(context).size.height * 0.015,
                             ),
                             Row(
@@ -169,12 +214,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 ElevatedButton(
                                   onPressed: () async {
-                                    if (formKeyLogIn.currentState!.validate()) {
-                                      await loginVM!.signIn(context);
-                                      if (!loginVM!.isLoggedIn) {
-                                        loginVM!.clearFieldValues();
-                                      }
-                                    }
+                                    emailController.clear();
+                                    passwordController.clear();
+                                    signUpViewModel!.clearFieldValues();
+                                    Navigator.of(context).pop();
                                   },
                                   child: Text(
                                     'Giriş',
@@ -192,33 +235,41 @@ class _LoginScreenState extends State<LoginScreen> {
                                         MediaQuery.of(context).size.height * 0.05),
                                   ),
                                 ),
-                                ElevatedButton(
-                                  child: Text(
-                                    'Kayıt ol',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                      fontSize: MediaQuery.of(context).size.shortestSide * 0.075,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.indigo.shade600,
-                                    enableFeedback: false,
-                                    shape: const StadiumBorder(),
-                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.4,
-                                        MediaQuery.of(context).size.height * 0.05),
-                                  ),
-                                  onPressed: () {
-                                    emailController.clear();
-                                    passwordController.clear();
-                                    loginVM!.clearFieldValues();
-                                    FocusScope.of(context).unfocus();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                                    );
-                                  },
-                                ),
+                                Provider<LoginViewModel>(
+                                    create: (_) => LoginViewModel(),
+                                    builder: (_, __) {
+                                      final loginViewModel = Provider.of<LoginViewModel>(_);
+                                      return ElevatedButton(
+                                        child: Text(
+                                          'Kayıt ol',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            fontSize: MediaQuery.of(context).size.shortestSide * 0.075,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.indigo.shade600,
+                                          enableFeedback: false,
+                                          shape: const StadiumBorder(),
+                                          minimumSize: Size(MediaQuery.of(context).size.width * 0.4,
+                                              MediaQuery.of(context).size.height * 0.05),
+                                        ),
+                                        onPressed: () async {
+                                          if (formKeyCreate.currentState!.validate()) {
+                                            await signUpViewModel!.signUp(context);
+                                            if (!signUpViewModel!.isSignUpCompleted) {
+                                              signUpViewModel!.clearFieldValues();
+                                            } else {
+                                              loginViewModel.isLogged = true;
+                                              Navigator.of(context).pushReplacementNamed('/landing');
+                                            }
+                                          }
+                                          ;
+                                          FocusScope.of(context).unfocus();
+                                        },
+                                      );
+                                    }),
                               ],
                             ),
                           ],

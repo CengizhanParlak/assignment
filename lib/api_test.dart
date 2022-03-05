@@ -31,7 +31,7 @@ class ApiTestScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 var m = LoginNetworkService();
-                m.signUpPOST(email: email, password: password).then((value) => print(value));
+                m.signUpPOST(context, email: email, password: password).then((value) => print(value));
               },
               child: const Text('Signup'),
             ),
@@ -104,26 +104,6 @@ class ApiTestScreen extends StatelessWidget {
     //               'Save',
     //               style: TextStyle(
     //                 color: Colors.grey.shade900,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //         const SizedBox(
-    //           height: 20,
-    //         ),
-    //         Container(
-    //           height: 65,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 15, Colors.grey.shade900),
-    //           child: TextButton(
-    //             onPressed: (() {
-    //               Navigator.of(context).pushNamed('/login');
-    //               // TODO: çıkış yap
-    //             }),
-    //             child: const Text(
-    //               'Log Out',
-    //               style: TextStyle(
-    //                 color: Colors.white,
     //               ),
     //             ),
     //           ),

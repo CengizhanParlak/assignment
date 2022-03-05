@@ -1,19 +1,42 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:assignment/api_test.dart';
 import 'package:assignment/core/base/model/base_api_model.dart';
-import 'package:assignment/view/authenticate/login/model/user_model.dart';
-import 'package:assignment/view/home/home_screen/model/blog_post.dart';
-import 'package:assignment/view/home/home_screen/model/category.dart';
-import 'package:assignment/view/home/home_screen/service/network_request.dart';
+import 'package:assignment/view/authenticate/login/model/login_model.dart';
+import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
+import 'package:assignment/view/authenticate/signup/viewmodel/signup_view_model.dart';
+import 'package:assignment/view/home/favorite/view/favorite_post_screen_view.dart';
+import 'package:assignment/view/home/favorite/viewmodel/favorite_posts_view_model.dart';
+import 'package:assignment/view/home/home_screen/model/blog_post_model.dart';
+import 'package:assignment/view/home/home_screen/model/category_model.dart';
+import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
+import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
+import 'package:assignment/view/home/home_screen/view/blog_post_screen_view.dart';
+import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
+import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
+import 'package:assignment/view/home/profile/model/account.dart';
+import 'package:assignment/view/home/profile/view/profile_screen_view.dart';
+import 'package:assignment/view/home/profile/viewmodel/account_view_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
-import 'package:assignment/view/authenticate/login/service/user_repository.dart';
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'core/service/network_helper.dart';
+import 'view/authenticate/login/view/login_screen_view.dart';
+import 'view/authenticate/signup/view/signup_screen_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+  }
   runApp(const MyApp());
 }
 
@@ -23,299 +46,74 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/': (context) => const AuthScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignUpScreen(),
-        '/landing': (context) => const LandingView(),
-        '/home': (context) => const HomeScreen(),
-        '/article': (context) => const ArticleScreen(),
-        '/favorite': (context) => const FavoriteScreen(),
-        '/profile': (context) => const ProfileScreen(),
-      },
-      title: 'Blog It',
-      theme: ThemeData.light(),
-    );
-  }
-}
-
-class AuthScreen extends StatelessWidget {
-  const AuthScreen({Key? key, this.isAuth = true}) : super(key: key);
-  final bool isAuth;
-  @override
-  Widget build(BuildContext context) {
-    if (isAuth) {
-      return const LandingView();
-    }
-    return const LoginScreen();
-  }
-}
-
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key, User? user}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: const Text('Login'),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            const Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey.shade900,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/landing')),
-              child: const Text(
-                'Login',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/signup')),
-              child: Text(
-                'Register',
-                style: TextStyle(
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ),
-          ],
-        ),
+    return MultiProvider(
+      providers: [
+        Provider<BlogPostListViewModel>(create: (_) => BlogPostListViewModel()),
+        Provider<CategoryViewModel>(create: (_) => CategoryViewModel()),
+        Provider<BlogPost>(create: (_) => BlogPost.fromJson({})),
+        Provider<FavoritePostsViewModel>(create: (_) => FavoritePostsViewModel()),
+        Provider<LoginViewModel>(create: (_) => LoginViewModel()),
+        Provider<SignUpViewModel>(create: (_) => SignUpViewModel()),
+        Provider<AccountViewModel>(create: (_) => AccountViewModel()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => AuthScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/signup': (context) => const SignUpScreen(),
+          '/landing': (context) => const LandingView(),
+          '/home': (context) => const HomeScreen(),
+          ArticleScreen.routeName: (context) => const ArticleScreen(),
+          '/favorite': (context) => const FavoriteScreen(),
+          '/profile': (context) => const ProfileScreen(),
+        },
+        title: 'Blog It',
+        theme: ThemeData.light(),
       ),
     );
   }
 }
 
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({Key? key, User? user}) : super(key: key);
+class AuthScreen extends StatefulWidget {
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Register'),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            const Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-              ),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Re-Password',
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey.shade900,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/login')),
-              child: const Text(
-                'Register',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-              ),
-              onPressed: (() => Navigator.of(context).pushNamed('/login')),
-              child: Text(
-                'Login',
-                style: TextStyle(
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  Size getSize(BuildContext context) {
-    return MediaQuery.of(context).size;
+class _AuthScreenState extends State<AuthScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final vmLogin = Provider.of<LoginViewModel>(context);
+    vmLogin.testConnection();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Flexible(
-            flex: 2,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: FutureBuilder<List<Category>>(
-                future: getCategories(ApiConstants.TEST_TOKEN),
-                builder: ((_, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                      List<Category> categories = snapshot.data;
-                      return Row(
-                        children: [
-                          for (var category in categories) ...{
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Card(
-                                    child: Image.network(
-                                      category.image!,
-                                      fit: BoxFit.fill,
-                                      width: getSize(context).width * 0.45,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(category.title!),
-                                ),
-                              ],
-                            )
-                          }
-                        ],
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('Error while fetching Data from API'),
-                      );
-                    }
-                    return const Center(
-                      child: Text('No Data'),
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Text('Blog'),
-          Expanded(
-            flex: 8,
-            child: FutureBuilder<List<BlogPost>>(
-              future: getBlogPosts(
-                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI"),
-              builder: ((BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                    List<BlogPost> blogs = snapshot.data;
-                    return GridView.builder(
-                      itemCount: 10, // TODO: blogs.length
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, mainAxisExtent: getSize(context).height * 0.4
-                          // crossAxisSpacing: 4.0,
-                          // mainAxisSpacing: 4.0,
-                          ),
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () => Navigator.of(context).pushNamed('/article'),
-                        child: Card(
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 5,
-                                child: Stack(
-                                  children: [
-                                    Image.network(
-                                      blogs.elementAt(index).image!,
-                                      fit: BoxFit.fill,
-                                      // height: getSize(context).height * 0.2,
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: IconButton(
-                                        icon: const Icon(
-                                          Icons.favorite,
-                                          color: Colors.grey,
-                                        ),
-                                        onPressed: () {
-                                          // TODO: implement favorite
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Text(blogs.elementAt(index).title!),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return const Center(
-                      child: Text('Error while fetching Data from API'),
-                    );
-                  }
-                  return const Center(
-                    child: Text('No Data'),
-                  );
+    final vmLogin = Provider.of<LoginViewModel>(context);
+    return SafeArea(
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+        ),
+        child: Center(
+          child: Observer(
+            builder: (_) {
+              if (vmLogin.isLoading) {
+                return const Center();
+              } else {
+                if (vmLogin.isLoggedIn) {
+                  return const LandingView();
+                } else {
+                  return const LoginScreen();
                 }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }),
-            ),
+              }
+            },
           ),
-        ],
+        ),
       ),
     );
   }
@@ -331,10 +129,35 @@ class LandingView extends StatefulWidget {
 class _LandingViewState extends State<LandingView> {
   int _selectedIndex = 1;
 
+  late AccountViewModel _accountViewModel;
+  late BlogPostListViewModel _blogPostListViewModel;
+  late FavoritePostsViewModel _favoritePostsViewModel;
+  late CategoryViewModel _categoryViewModel;
+
   void _changePage(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    _accountViewModel = Provider.of<AccountViewModel>(context);
+    _blogPostListViewModel = Provider.of<BlogPostListViewModel>(context);
+    _favoritePostsViewModel = Provider.of<FavoritePostsViewModel>(context);
+    _categoryViewModel = Provider.of<CategoryViewModel>(context);
+    await _accountViewModel.getAccountInfo(context);
+    _categoryViewModel.fetchCategories();
+    await _blogPostListViewModel.fetchBlogPosts();
+    _blogPostListViewModel.setFavorites(_accountViewModel.getFavoriteBlogIds);
+
+    _favoritePostsViewModel.addAllFavoritedPostsToFavorites(_blogPostListViewModel.favBlogPosts);
   }
 
   Widget get childWidget {
@@ -345,6 +168,8 @@ class _LandingViewState extends State<LandingView> {
         return const HomeScreen();
       case 2:
         return const ProfileScreen();
+      // case 3:
+      //   return const ApiTestScreen();
       default:
         return const HomeScreen();
     }
@@ -358,6 +183,8 @@ class _LandingViewState extends State<LandingView> {
         return const Text('Home');
       case 2:
         return const Text('My Profile');
+      // case 3:
+      //   return const Text('Api Test');
       default:
         return const Text('Home');
     }
@@ -365,6 +192,9 @@ class _LandingViewState extends State<LandingView> {
 
   @override
   Widget build(BuildContext context) {
+    final blogPostListVM = Provider.of<BlogPostListViewModel>(context);
+    blogPostListVM.initViedModel(context);
+    final favoritePostsVM = Provider.of<FavoritePostsViewModel>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -388,239 +218,54 @@ class _LandingViewState extends State<LandingView> {
             selectedItemColor: Colors.grey.shade900,
             currentIndex: _selectedIndex,
             onTap: _changePage,
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
+                icon: Stack(
+                  children: <Widget>[
+                    const Icon(Icons.notifications),
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 12,
+                          minHeight: 12,
+                        ),
+                        child: Observer(builder: (_) {
+                          return Text(
+                            '${favoritePostsVM.favoritePostsCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          );
+                        }),
+                      ),
+                    )
+                  ],
+                ),
                 label: 'Favorite',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Home',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.person),
                 label: 'Profile',
               ),
+              // const BottomNavigationBarItem(
+              //   icon: Icon(Icons.text_snippet),
+              //   label: 'Api Test',
+              // ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ArticleScreen extends StatelessWidget {
-  const ArticleScreen({Key? key}) : super(key: key);
-
-  void addFavorite(int id) {
-    // TODO: add to favorite
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Article Detail'),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: (() => addFavorite),
-              icon: const Icon(Icons.favorite),
-            ),
-          ],
-        ),
-        body: const Placeholder(
-          fallbackHeight: 100,
-          color: Colors.blue,
-        ),
-      ),
-    );
-  }
-}
-
-class FavoriteScreen extends StatelessWidget {
-  const FavoriteScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GridView.builder(
-        itemCount: 10,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 4.0,
-          mainAxisSpacing: 4.0,
-        ),
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed('/article'),
-          child: const Card(
-            child: Placeholder(
-              fallbackHeight: 100,
-              color: Colors.blue,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    var body = {
-      'Email': 'cengtest@gmail.com',
-      'Password': '123456',
-      'PasswordRetry': '123456',
-    };
-    final size = MediaQuery.of(context).size;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextButton(
-              onPressed: () {
-                http.post(
-                  Uri.parse(ApiConstants.SIGN_UP),
-                  body: jsonEncode(body),
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'token': '123456789',
-                  },
-                ).then((response) {
-                  print(response);
-                  print("----------------");
-                  print(response.body);
-                  print("----------------");
-                  print(response.headers);
-                  print("----------------");
-                  print(response.runtimeType);
-                });
-              },
-              child: const Text('Signup'),
-            ),
-            TextButton(
-              onPressed: () {
-                // http.get(url)
-              },
-              child: const Text('Login'),
-            ),
-            TextButton(
-              onPressed: () async {
-                List<BlogPost>? blogs = await getBlogPosts(
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOWMxOWIwN2QxZTEzOWFmNWI0ZDAiLCJuYmYiOjE2NDYyMzg3NDUsImV4cCI6MTY0ODgzMDc0NSwiaXNzIjoiaSIsImF1ZCI6ImEifQ.jEXOhFRqGYB50SYigh5fzsSpFJVWY88VeabkKojRmOI");
-                print(blogs?.length);
-                // print(ApiConstants.BLOG_POST);
-                // await http.post(
-                //   Uri.parse(ApiConstants.BLOG_POST),
-                //   headers: {
-                //     'Content-Type': 'application/json',
-                //     'Authorization':
-                //         'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MjFmOTlkOGIwN2QxZTEzOWFmNWI0Y2YiLCJuYmYiOjE2NDYyMzgxNjgsImV4cCI6MTY0ODgzMDE2OCwiaXNzIjoiaSIsImF1ZCI6ImEifQ.lpmO04HwFmExg9JCVMsKznbhMCq6sidIiOS5WvDRft8',
-                //     "Accept": "*/*",
-                //   },
-                // ).then((response) {
-                //   // List<Blog> y = x.data!.map((e) => Blog.fromJson(e)).toList();
-                //   // for (var element in y) {
-                //   //   print(element.title);
-                //   //   // print(element.categoryId);
-                //   //   print(element.image);
-                //   // }
-                // }).catchError((err) {
-                //   print(err);
-                //   // var x = BaseApiModel.fromJson(jsonDecode(err.body));
-                // });
-              },
-              child: const Text('Get Blogs'),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Get Blogs by Category'),
-            ),
-          ],
-        ),
-      ),
-    );
-    // return Center(
-    //   child: Padding(
-    //     padding: const EdgeInsets.only(top: 50),
-    //     child: Column(
-    //       children: [
-    //         Container(
-    //           decoration: _getDecoration(context, 100, Colors.white),
-    //           height: size.height * 0.1,
-    //           width: size.height * 0.1,
-    //         ),
-    //         SizedBox(
-    //           height: size.height * 0.05,
-    //         ),
-    //         Container(
-    //           height: size.height * 0.2,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 25, Colors.white),
-    //         ),
-    //         SizedBox(
-    //           height: size.height * 0.05,
-    //         ),
-    //         Container(
-    //           height: size.height * 0.1,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 15, Colors.white),
-    //           child: TextButton(
-    //             onPressed: (() {
-    //               // TODO: api isteği at
-    //             }),
-    //             child: Text(
-    //               'Save',
-    //               style: TextStyle(
-    //                 color: Colors.grey.shade900,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //         const SizedBox(
-    //           height: 20,
-    //         ),
-    //         Container(
-    //           height: 65,
-    //           width: 350,
-    //           decoration: _getDecoration(context, 15, Colors.grey.shade900),
-    //           child: TextButton(
-    //             onPressed: (() {
-    //               Navigator.of(context).pushNamed('/login');
-    //               // TODO: çıkış yap
-    //             }),
-    //             child: const Text(
-    //               'Log Out',
-    //               style: TextStyle(
-    //                 color: Colors.white,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
-  }
-
-  BoxDecoration _getDecoration(BuildContext context, double radius, Color color) {
-    return BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(radius),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.shade200,
-          blurRadius: 10,
-          spreadRadius: 5,
-        ),
-      ],
-      border: Border.all(
-        color: Colors.grey.shade900,
-        width: 1,
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginNetworkService with NetworkHelper implements INetworkService {
   @override
@@ -73,10 +74,11 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
     if (model?.data != null) {
       if (model!.hasError!) {
         showApiErrorDialog(context, model);
+        return model;
       } else {
+        final prefs = await SharedPreferences.getInstance();
         String authToken = model.data!["Token"];
-        debugPrint("resultAuthToken $authToken");
-        debugPrint("response model: ${model.toString()}");
+        prefs.setString('token', authToken);
         ApiConstants.TEST_TOKEN = authToken;
         return model;
       }
@@ -102,11 +104,11 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
     if (model?.data != null) {
       if (model!.hasError!) {
         showApiErrorDialog(context, model);
+        return model;
       } else {
-        // TODO: token'i shared prefs ile lokale falan kaydet
+        final prefs = await SharedPreferences.getInstance();
         String authToken = model.data!["Token"];
-        debugPrint("resultAuthToken $authToken");
-        debugPrint("response model: ${model.toString()}");
+        prefs.setString('token', authToken);
         ApiConstants.TEST_TOKEN = authToken;
         return model;
       }

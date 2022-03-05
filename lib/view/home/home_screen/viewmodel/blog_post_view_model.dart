@@ -19,8 +19,20 @@ abstract class _BlogPostListVievModelBase with Store {
 
   FavoritePostsViewModel? favoritePostsViewModel;
 
+  BlogPost getPostAtIndex(int index) => blogPosts[index];
+
+  int getIndexOfPostFromId(String id) => blogPosts.indexWhere((post) => post.id == id);
+
+  List<BlogPost> get favBlogPosts => blogPosts.where((element) => element.isFavorited == true).toList();
+
   @observable
   bool isInitialized = false;
+
+  @observable
+  bool isLoading = false;
+
+  @observable
+  ObservableList<BlogPost> blogPosts = <BlogPost>[].asObservable();
 
   @action
   void initViedModel(BuildContext context) {
@@ -29,32 +41,17 @@ abstract class _BlogPostListVievModelBase with Store {
     isInitialized = true;
   }
 
-  @computed
-  bool get isInitted => isInitialized;
-
-  BlogPost getPostAtIndex(int index) => blogPosts[index];
-
-  int getIndexOfPostFromId(String id) => blogPosts.indexWhere((post) => post.id == id);
-
-  @observable
-  ObservableList<BlogPost> blogPosts = <BlogPost>[].asObservable();
-
-  @computed
-  List<BlogPost> get favoritedBlogPosts => blogPosts.where((blogPost) => blogPost.isFavorited).toList();
-
-  @computed
-  bool get isBlogPostsEmpty => blogPosts.isEmpty;
-
-  @computed
-  bool get isFavoritedBlogPostsEmpty => favoritedBlogPosts.isEmpty;
+  @action
+  void setFavorites(List<String> favoriteArticleIds) {
+    for (var element in blogPosts) {
+      element.isFavorited = favoriteArticleIds.contains(element.id);
+    }
+  }
 
   @action
   bool isFavorited(int index) {
     return blogPosts[index].isFavorited;
   }
-
-  @computed
-  int get favoritedBlogPostCount => blogPosts.where((element) => element.isFavorited).length;
 
   @action
   Future<void> toggleFavorite(String articleId, int index) async {
@@ -77,9 +74,25 @@ abstract class _BlogPostListVievModelBase with Store {
 
   @action
   Future<void> fetchBlogPosts({String categoryId = ""}) async {
+    isLoading = true;
     var exBlogPosts = await networkService.getBlogPostsPOST(ApiConstants.TEST_TOKEN, categoryId: categoryId);
-    // blogPosts.addAll(decodedJson.map((e) => ExBlogPost(BlogPost.fromJson(e))).toList().asObservable());
     blogPosts.clear();
     blogPosts.addAll(exBlogPosts!.toList().asObservable());
+    isLoading = false;
   }
+
+  @computed
+  bool get isInitted => isInitialized;
+
+  @computed
+  List<BlogPost> get favoritedBlogPosts => blogPosts.where((blogPost) => blogPost.isFavorited).toList();
+
+  @computed
+  bool get isBlogPostsEmpty => blogPosts.isEmpty;
+
+  @computed
+  bool get isFavoritedBlogPostsEmpty => favoritedBlogPosts.isEmpty;
+
+  @computed
+  int get favoritedBlogPostCount => blogPosts.where((element) => element.isFavorited).length;
 }

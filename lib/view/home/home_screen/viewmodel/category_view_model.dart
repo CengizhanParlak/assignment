@@ -15,18 +15,21 @@ abstract class _CategoryViewModelBase with Store {
   @observable
   int selectedCategoryIndex = -1;
 
-  @computed
-  bool get isCategoriesLoaded => categories != null;
+  @observable
+  bool isLoading = false;
 
   @computed
   bool get isCategoriesEmpty => categories?.isEmpty ?? true;
 
   @action
   void fetchCategories() {
+    isLoading = true;
     networkService.getCategoriesGET(ApiConstants.TEST_TOKEN)?.then((value) {
       if (value.isNotEmpty) {
+        categories?.clear();
         categories = value;
       }
     });
+    isLoading = false;
   }
 }

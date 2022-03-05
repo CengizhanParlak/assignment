@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:assignment/core/constants/api_constants.dart';
+import 'package:assignment/core/service/log.dart';
 import 'package:http/http.dart' as http;
 
 mixin NetworkHelper {
@@ -16,7 +18,9 @@ mixin NetworkHelper {
         'Accept': '*/*',
         'Authorization': 'Bearer $token',
       },
-    );
+    ).catchError((err) {
+      Log.onError(err, 'NetworkHelper.sendPostRequest');
+    });
     return response;
   }
 
@@ -31,7 +35,21 @@ mixin NetworkHelper {
         'Accept': '*/*',
         'Authorization': 'Bearer $token',
       },
-    );
+    ).catchError((err) {
+      Log.onError(err, 'NetworkHelper.sendGetRequest');
+    });
     return response;
+  }
+}
+
+class AuthTester with NetworkHelper {
+  Future<bool> testConnection(String token) async {
+    var response = await sendGetRequest(url: ApiConstants.GET_ACCOUNT, token: token).catchError((err) {
+      Log.onError(err, 'AuthTester.testConnection');
+    });
+    if (response.statusCode == 200) {
+      return Future.value(true);
+    }
+    return Future.value(false);
   }
 }

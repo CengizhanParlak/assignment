@@ -22,8 +22,6 @@ class HomeScreen extends StatelessWidget {
     final blogPostListViewModel = Provider.of<BlogPostListViewModel>(context);
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
     final blogPostViewModel = Provider.of<BlogPostListViewModel>(context);
-    categoryViewModel.fetchCategories();
-    blogPostListViewModel.fetchBlogPosts();
 
     return Center(
       child: Column(
@@ -46,18 +44,28 @@ class HomeScreen extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Observer(builder: (_) {
-          if (!vmCategory.isCategoriesLoaded) {
+          if (vmCategory.isLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (vmCategory.isCategoriesEmpty) {
-            return const Text("No data returned from API");
           } else {
-            return Row(
-              children: [
-                ...categoryCard(vmBlogPost, vmCategory, context),
-              ],
-            );
+            if (vmCategory.isCategoriesEmpty) {
+              return Column(
+                children: [
+                  const Text("No data returned from API"),
+                  TextButton(
+                    onPressed: () => vmCategory.fetchCategories(),
+                    child: const Text('Tap to try again'),
+                  ),
+                ],
+              );
+            } else {
+              return Row(
+                children: [
+                  ...categoryCard(vmBlogPost, vmCategory, context),
+                ],
+              );
+            }
           }
         }),
       ),

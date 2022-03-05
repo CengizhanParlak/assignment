@@ -15,7 +15,9 @@ import 'package:assignment/view/home/home_screen/view/article_screen_view.dart';
 import 'package:assignment/view/home/home_screen/view/blog_post_screen_view.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
+import 'package:assignment/view/home/profile/model/account.dart';
 import 'package:assignment/view/home/profile/view/account_view.dart';
+import 'package:assignment/view/home/profile/viewmodel/account_view_model.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
 import 'package:assignment/core/constants/api_constants.dart';
@@ -23,10 +25,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
+import 'core/service/network_helper.dart';
 import 'view/authenticate/login/view/login_screen_view.dart';
 import 'view/authenticate/signup/view/signup_screen_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -44,12 +49,13 @@ class MyApp extends StatelessWidget {
         Provider<FavoritePostsViewModel>(create: (_) => FavoritePostsViewModel()),
         Provider<LoginViewModel>(create: (_) => LoginViewModel()),
         Provider<SignUpViewModel>(create: (_) => SignUpViewModel()),
+        Provider<AccountViewModel>(create: (_) => AccountViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
-          '/': (context) => const AuthScreen(),
+          '/': (context) => AuthScreen(),
           '/login': (context) => const LoginScreen(),
           '/signup': (context) => const SignUpScreen(),
           '/landing': (context) => const LandingView(),
@@ -65,22 +71,43 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final vmLogin = Provider.of<LoginViewModel>(context);
+    vmLogin.testConnection();
+  }
 
   @override
   Widget build(BuildContext context) {
     final vmLogin = Provider.of<LoginViewModel>(context);
     return SafeArea(
-      child: Center(
-        child: Observer(
-          builder: (_) {
-            if (vmLogin.isLoggedIn) {
-              return const LandingView();
-            } else {
-              return const LoginScreen();
-            }
-          },
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+        ),
+        child: Center(
+          child: Observer(
+            builder: (_) {
+              if (vmLogin.isLoading) {
+                return const Center();
+              } else {
+                if (vmLogin.isLoggedIn) {
+                  return const LandingView();
+                } else {
+                  return const LoginScreen();
+                }
+              }
+            },
+          ),
         ),
       ),
     );
@@ -97,6 +124,11 @@ class LandingView extends StatefulWidget {
 class _LandingViewState extends State<LandingView> {
   int _selectedIndex = 1;
 
+  late AccountViewModel _accountViewModel;
+  late BlogPostListViewModel _blogPostListViewModel;
+  late FavoritePostsViewModel _favoritePostsViewModel;
+  late CategoryViewModel _categoryViewModel;
+
   void _changePage(int index) {
     setState(() {
       _selectedIndex = index;
@@ -106,6 +138,21 @@ class _LandingViewState extends State<LandingView> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    _accountViewModel = Provider.of<AccountViewModel>(context);
+    _blogPostListViewModel = Provider.of<BlogPostListViewModel>(context);
+    _favoritePostsViewModel = Provider.of<FavoritePostsViewModel>(context);
+    _categoryViewModel = Provider.of<CategoryViewModel>(context);
+    await _accountViewModel.getAccountInfo();
+    _categoryViewModel.fetchCategories();
+    await _blogPostListViewModel.fetchBlogPosts();
+    _blogPostListViewModel.setFavorites(_accountViewModel.getFavoriteBlogIds);
+
+    _favoritePostsViewModel.addAllFavoritedPostsToFavorites(_blogPostListViewModel.favBlogPosts);
   }
 
   Widget get childWidget {

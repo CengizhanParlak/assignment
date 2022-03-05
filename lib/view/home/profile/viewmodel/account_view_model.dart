@@ -14,14 +14,17 @@ abstract class _AccountViewModelBase with Store {
   @observable
   Account? account;
 
+  @computed
+  List<String> get getFavoriteBlogIds => account?.favoriteBlogIds ?? [];
+
   @action
   void setAccount(Account account) {
     this.account = account;
   }
 
   @action
-  void getAccountInfo() {
-    networkService.getAccountInfo(ApiConstants.TEST_TOKEN)?.then((account) {
+  Future<void> getAccountInfo() async {
+    await networkService.getAccountInfo(ApiConstants.TEST_TOKEN)?.then((account) {
       setAccount(account);
     });
   }

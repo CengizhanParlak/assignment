@@ -99,6 +99,29 @@ mixin _$LoginViewModel on _LoginViewModelBase, Store {
     });
   }
 
+  final _$isLoadingAtom = Atom(name: '_LoginViewModelBase.isLoading');
+
+  @override
+  bool get isLoading {
+    _$isLoadingAtom.reportRead();
+    return super.isLoading;
+  }
+
+  @override
+  set isLoading(bool value) {
+    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
+      super.isLoading = value;
+    });
+  }
+
+  final _$testConnectionAsyncAction =
+      AsyncAction('_LoginViewModelBase.testConnection');
+
+  @override
+  Future<void> testConnection() {
+    return _$testConnectionAsyncAction.run(() => super.testConnection());
+  }
+
   final _$signInAsyncAction = AsyncAction('_LoginViewModelBase.signIn');
 
   @override
@@ -145,6 +168,7 @@ email: ${email},
 password: ${password},
 isLogged: ${isLogged},
 isPasswordVisible: ${isPasswordVisible},
+isLoading: ${isLoading},
 isLoggedIn: ${isLoggedIn},
 isEmailOrPasswordEmpty: ${isEmailOrPasswordEmpty},
 isEmailValid: ${isEmailValid},

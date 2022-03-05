@@ -65,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
               decoration: _getDecoration(context, 15, Colors.grey.shade900),
               child: TextButton(
                 onPressed: (() {
-                  loginVM.isLogged = false;
+                  loginVM.signOut();
                   Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                   // TODO: çıkış yap
                 }),

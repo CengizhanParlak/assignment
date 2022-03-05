@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/authenticate/login/model/login_model.dart';
 import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/service/network_helper.dart';
 import '../service/login_network_service.dart';
 part 'login_view_model.g.dart';
 
@@ -22,6 +25,9 @@ abstract class _LoginViewModelBase with Store {
 
   @observable
   bool isPasswordVisible = false;
+
+  @observable
+  bool isLoading = false;
 
   @computed
   bool get isLoggedIn => isLogged;
@@ -48,6 +54,23 @@ abstract class _LoginViewModelBase with Store {
   }
 
   @action
+  Future<void> testConnection() async {
+    isLoading = true;
+    final prefs = await SharedPreferences.getInstance();
+    final authTester = AuthTester();
+    String authToken = prefs.getString('token') ?? '';
+    final bool isAuthed = await authTester.testConnection(authToken);
+    if (!isAuthed) {
+      prefs.setString('token', '');
+      ApiConstants.TEST_TOKEN = '';
+    } else {
+      ApiConstants.TEST_TOKEN = authToken;
+    }
+    isLogged = isAuthed;
+    isLoading = false;
+  }
+
+  @action
   Future<void> signIn(context) async {
     var responseModel = await networkService.signInPOST(context, email: email, password: password);
     if (!responseModel.hasError!) {
@@ -58,5 +81,8 @@ abstract class _LoginViewModelBase with Store {
   @action
   Future<void> signOut() async {
     isLogged = false;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', '');
+    ApiConstants.TEST_TOKEN = '';
   }
 }

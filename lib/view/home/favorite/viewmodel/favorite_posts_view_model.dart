@@ -20,6 +20,11 @@ abstract class _FavoritePostsViewModel with Store {
   }
 
   @action
+  void addAllFavoritedPostsToFavorites(List<BlogPost> favoritePosts) {
+    this.favoritePosts.addAll(favoritePosts.map((element) => FavoritePost(blogPost: element)).toList());
+  }
+
+  @action
   void addToFavorite(FavoritePost favoritePost) {
     favoritePosts.add(favoritePost);
   }

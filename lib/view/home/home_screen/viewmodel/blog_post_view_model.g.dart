@@ -109,6 +109,17 @@ mixin _$BlogPostListViewModel on _BlogPostListVievModelBase, Store {
   }
 
   @override
+  void setFavorites(List<String> favoriteArticleIds) {
+    final _$actionInfo = _$_BlogPostListVievModelBaseActionController
+        .startAction(name: '_BlogPostListVievModelBase.setFavorites');
+    try {
+      return super.setFavorites(favoriteArticleIds);
+    } finally {
+      _$_BlogPostListVievModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   bool isFavorited(int index) {
     final _$actionInfo = _$_BlogPostListVievModelBaseActionController
         .startAction(name: '_BlogPostListVievModelBase.isFavorited');

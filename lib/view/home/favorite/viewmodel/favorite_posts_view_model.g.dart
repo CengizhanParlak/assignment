@@ -55,6 +55,17 @@ mixin _$FavoritePostsViewModel on _FavoritePostsViewModel, Store {
   }
 
   @override
+  void addAllFavoritedPostsToFavorites(List<BlogPost> favoritePosts) {
+    final _$actionInfo = _$_FavoritePostsViewModelActionController.startAction(
+        name: '_FavoritePostsViewModel.addAllFavoritedPostsToFavorites');
+    try {
+      return super.addAllFavoritedPostsToFavorites(favoritePosts);
+    } finally {
+      _$_FavoritePostsViewModelActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void addToFavorite(FavoritePost favoritePost) {
     final _$actionInfo = _$_FavoritePostsViewModelActionController.startAction(
         name: '_FavoritePostsViewModel.addToFavorite');

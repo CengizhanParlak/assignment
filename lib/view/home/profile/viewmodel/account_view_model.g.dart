@@ -9,6 +9,14 @@ part of 'account_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$AccountViewModel on _AccountViewModelBase, Store {
+  Computed<List<String>>? _$getFavoriteBlogIdsComputed;
+
+  @override
+  List<String> get getFavoriteBlogIds => (_$getFavoriteBlogIdsComputed ??=
+          Computed<List<String>>(() => super.getFavoriteBlogIds,
+              name: '_AccountViewModelBase.getFavoriteBlogIds'))
+      .value;
+
   final _$accountAtom = Atom(name: '_AccountViewModelBase.account');
 
   @override
@@ -24,6 +32,14 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
     });
   }
 
+  final _$getAccountInfoAsyncAction =
+      AsyncAction('_AccountViewModelBase.getAccountInfo');
+
+  @override
+  Future<void> getAccountInfo() {
+    return _$getAccountInfoAsyncAction.run(() => super.getAccountInfo());
+  }
+
   final _$_AccountViewModelBaseActionController =
       ActionController(name: '_AccountViewModelBase');
 
@@ -33,17 +49,6 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
         name: '_AccountViewModelBase.setAccount');
     try {
       return super.setAccount(account);
-    } finally {
-      _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void getAccountInfo() {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
-        name: '_AccountViewModelBase.getAccountInfo');
-    try {
-      return super.getAccountInfo();
     } finally {
       _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -74,7 +79,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
   @override
   String toString() {
     return '''
-account: ${account}
+account: ${account},
+getFavoriteBlogIds: ${getFavoriteBlogIds}
     ''';
   }
 }

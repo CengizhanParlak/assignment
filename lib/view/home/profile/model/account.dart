@@ -27,7 +27,7 @@ class Account {
         id: json["Id"],
         email: json["Email"],
         image: json["Image"],
-        location: Location.fromJson(json["Location"]),
+        location: Location.fromJson(json["Location"] ?? {}),
         favoriteBlogIds: List<String>.from(json["FavoriteBlogIds"].map((x) => x)),
       );
 

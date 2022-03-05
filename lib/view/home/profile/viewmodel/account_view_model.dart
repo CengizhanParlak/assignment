@@ -39,4 +39,9 @@ abstract class _AccountViewModelBase with Store {
     /// /Account/Update/ image URL update edilecek
     account!.image = url;
   }
+
+  @action
+  void updateAccountInfo() {
+    networkService.updateAccountInfo(ApiConstants.TEST_TOKEN, account: account ?? Account());
+  }
 }

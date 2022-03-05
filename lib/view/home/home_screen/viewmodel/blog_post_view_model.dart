@@ -37,7 +37,6 @@ abstract class _BlogPostListVievModelBase with Store {
   @action
   void initViedModel(BuildContext context) {
     favoritePostsViewModel = Provider.of<FavoritePostsViewModel>(context);
-    debugPrint("viewModel initted -- dependency injection");
     isInitialized = true;
   }
 

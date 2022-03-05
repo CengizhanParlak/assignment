@@ -14,7 +14,7 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     String url,
     String authToken, {
     required String method,
-    Map<String, String>? body,
+    Map<String, Object>? body,
   }) async {
     http.Response? response;
     switch (method) {
@@ -75,6 +75,28 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
       ApiConstants.GET_ACCOUNT,
       token,
       method: "get",
+    );
+
+    if (model?.data != null) {
+      return Account.fromJson(model!.data);
+    }
+
+    return Account();
+  }
+
+  Future<Account>? updateAccountInfo(String token, {Account? account}) async {
+    var body = {
+      "Image": account?.image ?? "",
+      "Location": {
+        "Longtitude": account?.location?.longtitude ?? "",
+        "Latitude": account?.location?.latitude ?? "",
+      },
+    };
+    BaseApiModel? model = await sendRequest(
+      ApiConstants.UPDATE_ACCOUNT,
+      token,
+      method: "post",
+      body: body,
     );
 
     if (model?.data != null) {

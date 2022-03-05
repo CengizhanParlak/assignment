@@ -1,18 +1,45 @@
 import 'dart:convert';
 
+import 'package:assignment/core/base/model/base_api_model.dart';
+import 'package:assignment/core/components/custom_alert_dialog.dart';
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/view/authenticate/login/viewmodel/login_view_model.dart';
 import 'package:assignment/view/home/home_screen/service/blog_network_service.dart';
 import 'package:assignment/view/home/profile/service/account_network_service.dart';
+import 'package:assignment/view/home/profile/service/location_service.dart';
+import 'package:assignment/view/home/profile/viewmodel/account_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:async';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Completer<GoogleMapController> _controller = Completer();
+  Position? position;
+  LoginViewModel? _loginViewModel;
+  AccountViewModel? _accountViewModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loginViewModel = Provider.of<LoginViewModel>(context);
+    _accountViewModel = Provider.of<AccountViewModel>(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final loginVM = Provider.of<LoginViewModel>(context);
+    final geoLocationService = GeoLocationService();
+
     var body = {
       'Email': 'cengtest@gmail.com',
       'Password': '123456',
@@ -45,8 +72,17 @@ class ProfileScreen extends StatelessWidget {
               width: 350,
               decoration: _getDecoration(context, 15, Colors.white),
               child: TextButton(
-                onPressed: (() {
-                  // TODO: api isteği at
+                onPressed: (() async {
+                  try {
+                    position = await geoLocationService.getCurrentLocation();
+                  } catch (err) {
+                    bool isPermissionRelatedError = err.toString().contains('permission');
+                    showCustomErrorDialog(
+                      context,
+                      err.toString(),
+                      isPermissionRelatedError ? Geolocator.openAppSettings : Geolocator.openLocationSettings,
+                    );
+                  }
                 }),
                 child: Text(
                   'Save',
@@ -65,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
               decoration: _getDecoration(context, 15, Colors.grey.shade900),
               child: TextButton(
                 onPressed: (() {
-                  loginVM.signOut();
+                  _loginViewModel?.signOut();
                   Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                   // TODO: çıkış yap
                 }),

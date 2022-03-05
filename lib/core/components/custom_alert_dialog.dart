@@ -22,6 +22,28 @@ void showApiErrorDialog(BuildContext context, BaseApiModel model) {
   );
 }
 
+Future<void> showCustomErrorDialog(BuildContext context, String message, Function() onPressed) {
+  String textButtonText = message.contains('permission') ? 'Telefon Ayarları' : 'Konum Ayarları';
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Hata"),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('İptal'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(child: Text(textButtonText), onPressed: onPressed),
+        ],
+      );
+    },
+  );
+}
+
 SingleChildScrollView getValidationErrorRows(List<ValidationError> validationErrors) {
   List<Row> rows = [];
   for (var validationError in validationErrors) {

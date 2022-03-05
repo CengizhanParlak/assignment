@@ -16,8 +16,9 @@ import 'package:assignment/view/home/home_screen/view/blog_post_screen_view.dart
 import 'package:assignment/view/home/home_screen/viewmodel/blog_post_view_model.dart';
 import 'package:assignment/view/home/home_screen/viewmodel/category_view_model.dart';
 import 'package:assignment/view/home/profile/model/account.dart';
-import 'package:assignment/view/home/profile/view/account_view.dart';
+import 'package:assignment/view/home/profile/view/profile_screen_view.dart';
 import 'package:assignment/view/home/profile/viewmodel/account_view_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
 import 'package:assignment/core/constants/api_constants.dart';
@@ -29,9 +30,13 @@ import 'core/service/network_helper.dart';
 import 'view/authenticate/login/view/login_screen_view.dart';
 import 'view/authenticate/signup/view/signup_screen_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+  }
   runApp(const MyApp());
 }
 

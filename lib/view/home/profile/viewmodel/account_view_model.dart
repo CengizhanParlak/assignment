@@ -17,14 +17,20 @@ abstract class _AccountViewModelBase with Store {
   @computed
   List<String> get getFavoriteBlogIds => account?.favoriteBlogIds ?? [];
 
+  @computed
+  bool get isAccountImageEmpty => account?.image?.isEmpty ?? true;
+
+  @computed
+  String get getAccountImage => account?.image ?? "";
+
   @action
   void setAccount(Account account) {
     this.account = account;
   }
 
   @action
-  Future<void> getAccountInfo() async {
-    await networkService.getAccountInfo(ApiConstants.TEST_TOKEN)?.then((account) {
+  Future<void> getAccountInfo(context) async {
+    await networkService.getAccountInfo(context, ApiConstants.TEST_TOKEN)?.then((account) {
       setAccount(account);
     });
   }
@@ -33,15 +39,22 @@ abstract class _AccountViewModelBase with Store {
   void setFavorites() {}
 
   @action
-  void changeAccountImage(String url) {
-    /// TODO:
-    /// /General/UploadImage/ image POST ile atılacak. dönen datadan url alınacak
-    /// /Account/Update/ image URL update edilecek
-    account!.image = url;
+  setLocation(String long, String lat) {
+    account?.location = Location.fromJson(
+      {
+        'Longtitude': long,
+        'Latitude': lat,
+      },
+    );
   }
 
   @action
-  void updateAccountInfo() {
-    networkService.updateAccountInfo(ApiConstants.TEST_TOKEN, account: account ?? Account());
+  void changeAccountImage(String url) {
+    account?.image = url;
+  }
+
+  @action
+  void updateAccountInfo(context) {
+    networkService.updateAccountInfo(context, ApiConstants.TEST_TOKEN, account: account ?? Account());
   }
 }

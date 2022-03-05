@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
+import 'package:assignment/core/components/custom_alert_dialog.dart';
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/core/service/INetwork_service.dart';
 import 'package:assignment/core/service/log.dart';
 import 'package:assignment/core/service/network_helper.dart';
 import 'package:assignment/view/home/profile/model/account.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AccountNetworkService with NetworkHelper implements INetworkService {
@@ -19,31 +21,19 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     http.Response? response;
     switch (method) {
       case "post":
-        // if (url == ApiConstants.BLOG_POST) {
-        //   response = await sendPostRequest(
-        //     url: url,
-        //     token: authToken,
-        //     body: body,
-        //   ).catchError((err) {
-        //     Log.onError(
-        //       err,
-        //       "sendPostRequestGetCategories",
-        //       className: "lib/view/home/home_screen/service/network_request.dart",
-        //     );
-        //   });
-        // } else if (url == ApiConstants.BLOG_POST_FAV) {
-        //   response = await sendPostRequest(
-        //     url: url,
-        //     token: authToken,
-        //     body: body,
-        //   ).catchError((err) {
-        //     Log.onError(
-        //       err,
-        //       "sendPostRequestToggleFav",
-        //       className: "lib/view/home/home_screen/service/network_request.dart",
-        //     );
-        //   });
-        // }
+        if (url == ApiConstants.UPDATE_ACCOUNT) {
+          response = await sendPostRequest(
+            url: url,
+            token: authToken,
+            body: body,
+          ).catchError((err) {
+            Log.onError(
+              err,
+              "sendPostRequestUpdateAccountInfo",
+              className: "lib/view/home/home_screen/service/network_request.dart",
+            );
+          });
+        }
         break;
       case "get":
         if (url == ApiConstants.GET_ACCOUNT) {
@@ -70,7 +60,7 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     return BaseApiModel.fromJson(json.decode(response.body));
   }
 
-  Future<Account>? getAccountInfo(String token) async {
+  Future<Account>? getAccountInfo(BuildContext context, String token) async {
     BaseApiModel? model = await sendRequest(
       ApiConstants.GET_ACCOUNT,
       token,
@@ -84,7 +74,7 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     return Account();
   }
 
-  Future<Account>? updateAccountInfo(String token, {Account? account}) async {
+  Future<bool> updateAccountInfo(BuildContext context, String token, {Account? account}) async {
     var body = {
       "Image": account?.image ?? "",
       "Location": {
@@ -100,9 +90,11 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     );
 
     if (model?.data != null) {
-      return Account.fromJson(model!.data);
+      if (model!.data) {
+        showApiErrorDialog(context, model);
+        return await Future.value(true);
+      }
     }
-
-    return Account();
+    return Future.value(false);
   }
 }

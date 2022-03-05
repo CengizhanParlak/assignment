@@ -57,7 +57,7 @@ SingleChildScrollView getValidationErrorRows(List<ValidationError> validationErr
   return SingleChildScrollView(
     child: Column(
       children: [
-        const Text('Hatalı girilen alanları kontrol edin:'),
+        Text(rows.isNotEmpty ? 'Hatalı girilen alanları kontrol edin:' : ''),
         ...rows,
       ],
     ),

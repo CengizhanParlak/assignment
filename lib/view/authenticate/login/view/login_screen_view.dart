@@ -113,46 +113,48 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.97,
-                              child: TextFormField(
-                                controller: passwordController,
-                                obscureText: !loginVM!.isPasswordVisible,
-                                onChanged: (value) {
-                                  loginVM!.password = value;
-                                },
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(),
-                                  hintText: 'Şifrenizi giriniz',
-                                  labelText: 'Şifre',
-                                  hintStyle: TextStyle(
-                                    fontSize: MediaQuery.of(context).size.shortestSide * 0.045,
+                              child: Observer(builder: (_) {
+                                return TextFormField(
+                                  controller: passwordController,
+                                  obscureText: !loginVM!.isPasswordVisible,
+                                  onChanged: (value) {
+                                    loginVM!.password = value;
+                                  },
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: 'Şifrenizi giriniz',
+                                    labelText: 'Şifre',
+                                    hintStyle: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.shortestSide * 0.045,
+                                    ),
+                                    labelStyle: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.shortestSide * 0.05,
+                                    ),
+                                    suffixIcon: Observer(builder: (_) {
+                                      return IconButton(
+                                        onPressed: () => loginVM!.togglePasswordVisibility(),
+                                        icon: Icon(
+                                          !loginVM!.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                        ),
+                                        splashColor: Colors.transparent,
+                                      );
+                                    }),
                                   ),
-                                  labelStyle: TextStyle(
-                                    fontSize: MediaQuery.of(context).size.shortestSide * 0.05,
-                                  ),
-                                  suffixIcon: Observer(builder: (_) {
-                                    return IconButton(
-                                      onPressed: () => loginVM!.togglePasswordVisibility(),
-                                      icon: Icon(
-                                        !loginVM!.isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                      ),
-                                      splashColor: Colors.transparent,
-                                    );
-                                  }),
-                                ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Şifre boş bırakılamaz';
-                                  }
-                                  if (value.contains(' ')) {
-                                    return 'Şifre boşluk içeremez';
-                                  }
-                                  if (!loginVM!.isPasswordValid) {
-                                    return 'Şifre en az 6 karakter olmalıdır';
-                                  }
-                                  return null;
-                                },
-                                onEditingComplete: () => FocusScope.of(context).unfocus(),
-                              ),
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Şifre boş bırakılamaz';
+                                    }
+                                    if (value.contains(' ')) {
+                                      return 'Şifre boşluk içeremez';
+                                    }
+                                    if (!loginVM!.isPasswordValid) {
+                                      return 'Şifre en az 6 karakter olmalıdır';
+                                    }
+                                    return null;
+                                  },
+                                  onEditingComplete: () => FocusScope.of(context).unfocus(),
+                                );
+                              }),
                             ),
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.015,

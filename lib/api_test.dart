@@ -53,7 +53,7 @@ class ApiTestScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 var networkService = AccountNetworkService();
-                networkService.getAccountInfo(ApiConstants.TEST_TOKEN)?.then((account) {
+                networkService.getAccountInfo(context, ApiConstants.TEST_TOKEN)?.then((account) {
                   print(account.toJson());
                 });
               },

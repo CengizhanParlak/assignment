@@ -13,8 +13,19 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   List<String> get getFavoriteBlogIds => (_$getFavoriteBlogIdsComputed ??=
-          Computed<List<String>>(() => super.getFavoriteBlogIds,
-              name: '_AccountViewModelBase.getFavoriteBlogIds'))
+          Computed<List<String>>(() => super.getFavoriteBlogIds, name: '_AccountViewModelBase.getFavoriteBlogIds'))
+      .value;
+  Computed<bool>? _$isEmptyComputed;
+
+  @override
+  bool get isAccountImageEmpty =>
+      (_$isEmptyComputed ??= Computed<bool>(() => super.isAccountImageEmpty, name: '_AccountViewModelBase.isEmpty'))
+          .value;
+  Computed<String>? _$accountImageComputed;
+
+  @override
+  String get getAccountImage => (_$accountImageComputed ??=
+          Computed<String>(() => super.getAccountImage, name: '_AccountViewModelBase.accountImage'))
       .value;
 
   final _$accountAtom = Atom(name: '_AccountViewModelBase.account');
@@ -32,21 +43,18 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
     });
   }
 
-  final _$getAccountInfoAsyncAction =
-      AsyncAction('_AccountViewModelBase.getAccountInfo');
+  final _$getAccountInfoAsyncAction = AsyncAction('_AccountViewModelBase.getAccountInfo');
 
   @override
-  Future<void> getAccountInfo() {
-    return _$getAccountInfoAsyncAction.run(() => super.getAccountInfo());
+  Future<void> getAccountInfo(dynamic context) {
+    return _$getAccountInfoAsyncAction.run(() => super.getAccountInfo(context));
   }
 
-  final _$_AccountViewModelBaseActionController =
-      ActionController(name: '_AccountViewModelBase');
+  final _$_AccountViewModelBaseActionController = ActionController(name: '_AccountViewModelBase');
 
   @override
   void setAccount(Account account) {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
-        name: '_AccountViewModelBase.setAccount');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setAccount');
     try {
       return super.setAccount(account);
     } finally {
@@ -56,8 +64,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   void setFavorites() {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
-        name: '_AccountViewModelBase.setFavorites');
+    final _$actionInfo =
+        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setFavorites');
     try {
       return super.setFavorites();
     } finally {
@@ -66,11 +74,32 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
   }
 
   @override
+  dynamic setLocation(String long, String lat) {
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setLocation');
+    try {
+      return super.setLocation(long, lat);
+    } finally {
+      _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void changeAccountImage(String url) {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
-        name: '_AccountViewModelBase.changeAccountImage');
+    final _$actionInfo =
+        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.changeAccountImage');
     try {
       return super.changeAccountImage(url);
+    } finally {
+      _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateAccountInfo(dynamic context) {
+    final _$actionInfo =
+        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.updateAccountInfo');
+    try {
+      return super.updateAccountInfo(context);
     } finally {
       _$_AccountViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -80,7 +109,9 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
   String toString() {
     return '''
 account: ${account},
-getFavoriteBlogIds: ${getFavoriteBlogIds}
+getFavoriteBlogIds: ${getFavoriteBlogIds},
+isEmpty: ${isAccountImageEmpty},
+accountImage: ${getAccountImage}
     ''';
   }
 }

@@ -152,7 +152,7 @@ class _LandingViewState extends State<LandingView> {
     _blogPostListViewModel = Provider.of<BlogPostListViewModel>(context);
     _favoritePostsViewModel = Provider.of<FavoritePostsViewModel>(context);
     _categoryViewModel = Provider.of<CategoryViewModel>(context);
-    await _accountViewModel.getAccountInfo();
+    await _accountViewModel.getAccountInfo(context);
     _categoryViewModel.fetchCategories();
     await _blogPostListViewModel.fetchBlogPosts();
     _blogPostListViewModel.setFavorites(_accountViewModel.getFavoriteBlogIds);

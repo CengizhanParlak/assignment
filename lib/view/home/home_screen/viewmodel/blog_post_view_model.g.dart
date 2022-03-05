@@ -61,6 +61,21 @@ mixin _$BlogPostListViewModel on _BlogPostListVievModelBase, Store {
     });
   }
 
+  final _$isLoadingAtom = Atom(name: '_BlogPostListVievModelBase.isLoading');
+
+  @override
+  bool get isLoading {
+    _$isLoadingAtom.reportRead();
+    return super.isLoading;
+  }
+
+  @override
+  set isLoading(bool value) {
+    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
+      super.isLoading = value;
+    });
+  }
+
   final _$blogPostsAtom = Atom(name: '_BlogPostListVievModelBase.blogPosts');
 
   @override
@@ -134,6 +149,7 @@ mixin _$BlogPostListViewModel on _BlogPostListVievModelBase, Store {
   String toString() {
     return '''
 isInitialized: ${isInitialized},
+isLoading: ${isLoading},
 blogPosts: ${blogPosts},
 isInitted: ${isInitted},
 favoritedBlogPosts: ${favoritedBlogPosts},

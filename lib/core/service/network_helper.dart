@@ -8,7 +8,7 @@ mixin NetworkHelper {
   Future<http.Response> sendPostRequest({
     required String url,
     required String token,
-    Map<String, String>? body,
+    Map<String, Object>? body,
   }) async {
     final response = await http.post(
       Uri.parse(url),

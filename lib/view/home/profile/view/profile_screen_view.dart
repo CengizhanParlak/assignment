@@ -9,6 +9,7 @@ import 'package:assignment/view/home/profile/service/account_network_service.dar
 import 'package:assignment/view/home/profile/service/location_service.dart';
 import 'package:assignment/view/home/profile/viewmodel/account_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Position? position;
   LoginViewModel? _loginViewModel;
   AccountViewModel? _accountViewModel;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void didChangeDependencies() {
@@ -47,14 +49,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     };
     final size = MediaQuery.of(context).size;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 50),
+      child: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              decoration: _getDecoration(context, 100, Colors.white),
-              height: size.height * 0.1,
-              width: size.height * 0.1,
+            Stack(
+              children: [
+                Container(
+                  decoration: _getDecoration(context, 100, Colors.white),
+                  height: size.height * 0.2,
+                  width: size.height * 0.2,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: _getDecoration(context, 50, Colors.black),
+                    child: IconButton(
+                      tooltip: 'Fotoğraf yükle',
+                      icon: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: size.height * 0.03,
+                      ),
+                      onPressed: () async {
+                        await showCameraModal(context, size);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
             SizedBox(
               height: size.height * 0.05,
@@ -68,13 +91,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: size.height * 0.05,
             ),
             Container(
-              height: size.height * 0.1,
+              height: size.height * 0.08,
               width: 350,
               decoration: _getDecoration(context, 15, Colors.white),
               child: TextButton(
                 onPressed: (() async {
                   try {
                     position = await geoLocationService.getCurrentLocation();
+                    _accountViewModel?.setLocation(
+                      position?.longitude.toString() ?? "",
+                      position?.latitude.toString() ?? "",
+                    );
+                    _accountViewModel?.updateAccountInfo(context);
                   } catch (err) {
                     bool isPermissionRelatedError = err.toString().contains('permission');
                     showCustomErrorDialog(
@@ -96,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 20,
             ),
             Container(
-              height: 65,
+              height: size.height * 0.08,
               width: 350,
               decoration: _getDecoration(context, 15, Colors.grey.shade900),
               child: TextButton(
@@ -117,6 +145,147 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  showCameraModal(BuildContext context, Size size) async {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            children: [
+              Observer(builder: (_) {
+                if (!_accountViewModel!.isAccountImageEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Container(
+                        height: size.width * 0.8,
+                        width: size.width * 0.8,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(_accountViewModel?.getAccountImage ?? ''),
+                          ),
+                        )),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Container(
+                      height: size.width * 0.8,
+                      width: size.width * 0.8,
+                      decoration: _getDecoration(context, 15, Colors.grey.shade300),
+                    ),
+                  );
+                  ;
+                }
+              }),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: size.width * 0.1,
+                  vertical: size.height * 0.03,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      decoration: _getDecoration(context, 15, Colors.grey.shade900),
+                      width: size.width * 0.35,
+                      child: TextButton(
+                        child: const Text(
+                          'Select',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                size = MediaQuery.of(context).size;
+                                return AlertDialog(
+                                  title: const Center(
+                                    child: Text('Select a Picture'),
+                                  ),
+                                  content: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          decoration: _getDecoration(context, 15, Colors.grey.shade900),
+                                          width: size.width * 0.9,
+                                          child: TextButton(
+                                            child: const Text(
+                                              'Camera',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                                              if (pickedFile != null) {
+                                                // _accountViewModel?.setImage(pickedFile.path);
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: size.height * 0.02),
+                                          child: Container(
+                                            decoration: _getDecoration(context, 15, Colors.white),
+                                            width: size.width * 0.9,
+                                            child: TextButton(
+                                              child: Text(
+                                                'Gallery',
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade900,
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              onPressed: () async {
+                                                final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+                                                if (pickedFile != null) {
+                                                  // _accountViewModel?.setImage(pickedFile.path);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                    ),
+                    Container(
+                      decoration: _getDecoration(context, 15, Colors.white),
+                      width: size.width * 0.35,
+                      child: TextButton(
+                        child: const Text(
+                          'Remove',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                          ),
+                        ),
+                        onPressed: () async {
+                          final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                          if (pickedFile != null) {
+                            // _accountViewModel?.setImage(pickedFile.path);
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
   }
 
   BoxDecoration _getDecoration(BuildContext context, double radius, Color color) {

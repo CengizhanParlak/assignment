@@ -79,12 +79,7 @@ abstract class _BlogPostListVievModelBase with Store {
   Future<void> fetchBlogPosts({String categoryId = ""}) async {
     var exBlogPosts = await networkService.getBlogPostsPOST(ApiConstants.TEST_TOKEN, categoryId: categoryId);
     // blogPosts.addAll(decodedJson.map((e) => ExBlogPost(BlogPost.fromJson(e))).toList().asObservable());
-    if (categoryId.isEmpty) {
-      blogPosts.clear();
-      blogPosts.addAll(exBlogPosts!.toList().asObservable());
-    } else {
-      blogPosts.clear();
-      blogPosts.addAll(exBlogPosts!.toList().asObservable());
-    }
+    blogPosts.clear();
+    blogPosts.addAll(exBlogPosts!.toList().asObservable());
   }
 }

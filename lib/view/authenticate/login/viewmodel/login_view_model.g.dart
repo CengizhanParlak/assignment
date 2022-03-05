@@ -41,13 +41,13 @@ mixin _$LoginViewModel on _LoginViewModelBase, Store {
   final _$emailAtom = Atom(name: '_LoginViewModelBase.email');
 
   @override
-  String? get email {
+  String get email {
     _$emailAtom.reportRead();
     return super.email;
   }
 
   @override
-  set email(String? value) {
+  set email(String value) {
     _$emailAtom.reportWrite(value, super.email, () {
       super.email = value;
     });
@@ -56,13 +56,13 @@ mixin _$LoginViewModel on _LoginViewModelBase, Store {
   final _$passwordAtom = Atom(name: '_LoginViewModelBase.password');
 
   @override
-  String? get password {
+  String get password {
     _$passwordAtom.reportRead();
     return super.password;
   }
 
   @override
-  set password(String? value) {
+  set password(String value) {
     _$passwordAtom.reportWrite(value, super.password, () {
       super.password = value;
     });
@@ -83,11 +83,27 @@ mixin _$LoginViewModel on _LoginViewModelBase, Store {
     });
   }
 
+  final _$isPasswordVisibleAtom =
+      Atom(name: '_LoginViewModelBase.isPasswordVisible');
+
+  @override
+  bool get isPasswordVisible {
+    _$isPasswordVisibleAtom.reportRead();
+    return super.isPasswordVisible;
+  }
+
+  @override
+  set isPasswordVisible(bool value) {
+    _$isPasswordVisibleAtom.reportWrite(value, super.isPasswordVisible, () {
+      super.isPasswordVisible = value;
+    });
+  }
+
   final _$signInAsyncAction = AsyncAction('_LoginViewModelBase.signIn');
 
   @override
-  Future<void> signIn() {
-    return _$signInAsyncAction.run(() => super.signIn());
+  Future<void> signIn(dynamic context) {
+    return _$signInAsyncAction.run(() => super.signIn(context));
   }
 
   final _$signOutAsyncAction = AsyncAction('_LoginViewModelBase.signOut');
@@ -97,12 +113,38 @@ mixin _$LoginViewModel on _LoginViewModelBase, Store {
     return _$signOutAsyncAction.run(() => super.signOut());
   }
 
+  final _$_LoginViewModelBaseActionController =
+      ActionController(name: '_LoginViewModelBase');
+
+  @override
+  void togglePasswordVisibility() {
+    final _$actionInfo = _$_LoginViewModelBaseActionController.startAction(
+        name: '_LoginViewModelBase.togglePasswordVisibility');
+    try {
+      return super.togglePasswordVisibility();
+    } finally {
+      _$_LoginViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void clearFieldValues() {
+    final _$actionInfo = _$_LoginViewModelBaseActionController.startAction(
+        name: '_LoginViewModelBase.clearFieldValues');
+    try {
+      return super.clearFieldValues();
+    } finally {
+      _$_LoginViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
 email: ${email},
 password: ${password},
 isLogged: ${isLogged},
+isPasswordVisible: ${isPasswordVisible},
 isLoggedIn: ${isLoggedIn},
 isEmailOrPasswordEmpty: ${isEmailOrPasswordEmpty},
 isEmailValid: ${isEmailValid},

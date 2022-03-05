@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
+import 'package:assignment/core/components/custom_alert_dialog.dart';
 import 'package:assignment/core/constants/api_constants.dart';
 import 'package:assignment/core/service/INetwork_service.dart';
 import 'package:assignment/core/service/log.dart';
@@ -56,7 +57,7 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
     return BaseApiModel.fromJson(json.decode(response.body));
   }
 
-  Future<BaseApiModel> signInPOST({required String email, required String password}) async {
+  Future<BaseApiModel> signInPOST(context, {required String email, required String password}) async {
     var body = {
       "Email": email,
       "Password": password,
@@ -70,11 +71,15 @@ class LoginNetworkService with NetworkHelper implements INetworkService {
     );
 
     if (model?.data != null) {
-      String authToken = model!.data!["Token"];
-      debugPrint("resultAuthToken $authToken");
-      debugPrint("response model: ${model.toString()}");
-      ApiConstants.TEST_TOKEN = authToken;
-      return model;
+      if (model!.hasError!) {
+        showApiErrorDialog(context, model);
+      } else {
+        String authToken = model.data!["Token"];
+        debugPrint("resultAuthToken $authToken");
+        debugPrint("response model: ${model.toString()}");
+        ApiConstants.TEST_TOKEN = authToken;
+        return model;
+      }
     }
     return BaseApiModel();
   }

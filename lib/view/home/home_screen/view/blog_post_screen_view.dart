@@ -123,6 +123,7 @@ Expanded blogPostGridView(BlogPostListViewModel vmBlogPost, BuildContext context
             child: CircularProgressIndicator(),
           );
         } else {
+          print(vmBlogPost.blogPosts.length);
           return GridView.builder(
             // TODO: vmBlogPost.blogPosts.length, keep alive yapılacak, önceki session'da son seçilen kategorideki blogları getir
             // itemCount: vmBlogPost.blogPosts.length,

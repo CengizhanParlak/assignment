@@ -13,19 +13,22 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   List<String> get getFavoriteBlogIds => (_$getFavoriteBlogIdsComputed ??=
-          Computed<List<String>>(() => super.getFavoriteBlogIds, name: '_AccountViewModelBase.getFavoriteBlogIds'))
+          Computed<List<String>>(() => super.getFavoriteBlogIds,
+              name: '_AccountViewModelBase.getFavoriteBlogIds'))
       .value;
-  Computed<bool>? _$isEmptyComputed;
+  Computed<bool>? _$isAccountImageEmptyComputed;
 
   @override
-  bool get isAccountImageEmpty =>
-      (_$isEmptyComputed ??= Computed<bool>(() => super.isAccountImageEmpty, name: '_AccountViewModelBase.isEmpty'))
-          .value;
-  Computed<String>? _$accountImageComputed;
+  bool get isAccountImageEmpty => (_$isAccountImageEmptyComputed ??=
+          Computed<bool>(() => super.isAccountImageEmpty,
+              name: '_AccountViewModelBase.isAccountImageEmpty'))
+      .value;
+  Computed<String>? _$getAccountImageComputed;
 
   @override
-  String get getAccountImage => (_$accountImageComputed ??=
-          Computed<String>(() => super.getAccountImage, name: '_AccountViewModelBase.accountImage'))
+  String get getAccountImage => (_$getAccountImageComputed ??= Computed<String>(
+          () => super.getAccountImage,
+          name: '_AccountViewModelBase.getAccountImage'))
       .value;
 
   final _$accountAtom = Atom(name: '_AccountViewModelBase.account');
@@ -43,18 +46,30 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
     });
   }
 
-  final _$getAccountInfoAsyncAction = AsyncAction('_AccountViewModelBase.getAccountInfo');
+  final _$getAccountInfoAsyncAction =
+      AsyncAction('_AccountViewModelBase.getAccountInfo');
 
   @override
   Future<void> getAccountInfo(dynamic context) {
     return _$getAccountInfoAsyncAction.run(() => super.getAccountInfo(context));
   }
 
-  final _$_AccountViewModelBaseActionController = ActionController(name: '_AccountViewModelBase');
+  final _$uploadAccountImageAsyncAction =
+      AsyncAction('_AccountViewModelBase.uploadAccountImage');
+
+  @override
+  Future<void> uploadAccountImage(dynamic context, String imagePath) {
+    return _$uploadAccountImageAsyncAction
+        .run(() => super.uploadAccountImage(context, imagePath));
+  }
+
+  final _$_AccountViewModelBaseActionController =
+      ActionController(name: '_AccountViewModelBase');
 
   @override
   void setAccount(Account account) {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setAccount');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.setAccount');
     try {
       return super.setAccount(account);
     } finally {
@@ -64,8 +79,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   void setFavorites() {
-    final _$actionInfo =
-        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setFavorites');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.setFavorites');
     try {
       return super.setFavorites();
     } finally {
@@ -75,7 +90,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   dynamic setLocation(String long, String lat) {
-    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.setLocation');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.setLocation');
     try {
       return super.setLocation(long, lat);
     } finally {
@@ -85,8 +101,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   void changeAccountImage(String url) {
-    final _$actionInfo =
-        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.changeAccountImage');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.changeAccountImage');
     try {
       return super.changeAccountImage(url);
     } finally {
@@ -96,8 +112,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
 
   @override
   void updateAccountInfo(dynamic context) {
-    final _$actionInfo =
-        _$_AccountViewModelBaseActionController.startAction(name: '_AccountViewModelBase.updateAccountInfo');
+    final _$actionInfo = _$_AccountViewModelBaseActionController.startAction(
+        name: '_AccountViewModelBase.updateAccountInfo');
     try {
       return super.updateAccountInfo(context);
     } finally {
@@ -110,8 +126,8 @@ mixin _$AccountViewModel on _AccountViewModelBase, Store {
     return '''
 account: ${account},
 getFavoriteBlogIds: ${getFavoriteBlogIds},
-isEmpty: ${isAccountImageEmpty},
-accountImage: ${getAccountImage}
+isAccountImageEmpty: ${isAccountImageEmpty},
+getAccountImage: ${getAccountImage}
     ''';
   }
 }

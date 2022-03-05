@@ -49,6 +49,13 @@ abstract class _AccountViewModelBase with Store {
   }
 
   @action
+  Future<void> uploadAccountImage(context, String imagePath) async {
+    String resultedImageUrl = await networkService.uploadAccountImage(context, ApiConstants.TEST_TOKEN,
+        account: account!, imagePath: imagePath);
+    account?.image = resultedImageUrl;
+  }
+
+  @action
   void changeAccountImage(String url) {
     account?.image = url;
   }

@@ -62,20 +62,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    decoration: _getDecoration(context, 50, Colors.black),
-                    child: IconButton(
-                      tooltip: 'Fotoğraf yükle',
-                      icon: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: size.height * 0.03,
+                  child: Observer(builder: (_) {
+                    if (!_accountViewModel!.isAccountImageEmpty) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: NetworkImage(
+                              _accountViewModel!.getAccountImage,
+                            ),
+                          ),
+                        ),
+                        child: IconButton(
+                          tooltip: 'Fotoğraf yükle',
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: Colors.black,
+                            size: size.height * 0.03,
+                          ),
+                          onPressed: () async {
+                            await showCameraModal(context, size);
+                          },
+                        ),
+                      );
+                    }
+                    return Container(
+                      decoration: _getDecoration(context, 100, Colors.white),
+                      child: IconButton(
+                        tooltip: 'Fotoğraf yükle',
+                        icon: Icon(
+                          Icons.camera_alt,
+                          color: Colors.black,
+                          size: size.height * 0.03,
+                        ),
+                        onPressed: () async {
+                          await showCameraModal(context, size);
+                        },
                       ),
-                      onPressed: () async {
-                        await showCameraModal(context, size);
-                      },
-                    ),
-                  ),
+                    );
+                  }),
                 ),
               ],
             ),
@@ -223,9 +249,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ),
                                             ),
                                             onPressed: () async {
-                                              final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                                              final pickedFile =
+                                                  await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
                                               if (pickedFile != null) {
-                                                // _accountViewModel?.setImage(pickedFile.path);
+                                                await _accountViewModel?.uploadAccountImage(context, pickedFile.path);
                                               }
                                             },
                                           ),
@@ -244,9 +271,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                               ),
                                               onPressed: () async {
-                                                final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+                                                final pickedFile = await _picker.pickImage(
+                                                    source: ImageSource.gallery, imageQuality: 50);
                                                 if (pickedFile != null) {
-                                                  // _accountViewModel?.setImage(pickedFile.path);
+                                                  await _accountViewModel?.uploadAccountImage(context, pickedFile.path);
                                                 }
                                               },
                                             ),

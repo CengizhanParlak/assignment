@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:assignment/core/base/model/base_api_model.dart';
 import 'package:assignment/core/components/custom_alert_dialog.dart';
@@ -9,6 +10,7 @@ import 'package:assignment/core/service/network_helper.dart';
 import 'package:assignment/view/home/profile/model/account.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class AccountNetworkService with NetworkHelper implements INetworkService {
   @override
@@ -72,6 +74,32 @@ class AccountNetworkService with NetworkHelper implements INetworkService {
     }
 
     return Account();
+  }
+
+  Future<String> uploadAccountImage(context, token, {required Account account, required String imagePath}) async {
+    // BaseApiModel? model = await sendRequest(
+    //   ApiConstants.UPDATE_ACCOUNT,
+    //   token,
+    //   method: "post",
+    //   body: {},
+    // );
+    var model;
+    var postUri = Uri.parse(ApiConstants.UPLOAD_IMAGE);
+    var request = http.MultipartRequest("POST", postUri);
+    request.files.add(http.MultipartFile.fromBytes('file', await File.fromUri(Uri.parse(imagePath)).readAsBytes(),
+        contentType: MediaType('image', 'jpeg')));
+
+    await request.send().then((response) {
+      if (response.statusCode == 200) print("Uploaded!");
+      model = response;
+    });
+
+    if (model?.data != null) {
+      if (!model!.hasError!) {
+        return account.image = model.data;
+      }
+    }
+    return '';
   }
 
   Future<bool> updateAccountInfo(BuildContext context, String token, {Account? account}) async {
